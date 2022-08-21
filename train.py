@@ -195,6 +195,7 @@ def train():
             # to device
             images = images.to(device)
             masks = masks.to(device)
+            targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
             # inference
             loss_dict = model(images, mask=masks, targets=targets)
