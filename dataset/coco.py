@@ -198,20 +198,28 @@ if __name__ == '__main__':
         image = image.astype(np.uint8)
         # to BGR
         image = image[..., (2, 1, 0)]
-        
+
         image = image.copy()
         img_h, img_w = image.shape[:2]
 
         boxes = target["boxes"]
         labels = target["labels"]
+        height, width = target['orig_size'].tolist()
 
         for box, label in zip(boxes, labels):
             x1, y1, x2, y2 = box
+            x1 = int(x1 * width)
+            y1 = int(y1 * height)
+            x2 = int(x2 * width)
+            y2 = int(y2 * height)
+
             cls_id = int(label)
             color = class_colors[cls_id]
+
             # class name
             label = coco_class_labels[cls_id]
-            image = cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), (0,0,255), 2)
+            image = cv2.rectangle(image, (x1, y1, x2, y2), (0, 0, 255), 2)
+            
             # put the test on the bbox
             cv2.putText(image, label, (int(x1), int(y1 - 5)), 0, 0.5, color, 1, lineType=cv2.LINE_AA)
         cv2.imshow('gt', image)
