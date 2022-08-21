@@ -58,6 +58,7 @@ class Criterion(object):
         self.losses = losses
         empty_weight = torch.ones(self.num_classes + 1)
         empty_weight[-1] = self.eos_coef
+        self.empty_weight = empty_weight
 
 
     def _get_src_permutation_idx(self, indices):
