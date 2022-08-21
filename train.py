@@ -214,7 +214,7 @@ def train():
 
             # inference
             t0 = time.time()
-            outputs = model(images, mask=masks, targets=targets)
+            outputs = model(images, mask=masks)
             print(time.time() - t0)
 
             # loss

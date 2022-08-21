@@ -212,7 +212,7 @@ class DeTR(nn.Module):
         return bboxes, scores, labels
                 
 
-    def forward(self, x, targets=None, mask=None):
+    def forward(self, x, mask=None):
         if not self.trainable:
             return self.inference(x)
         else:
