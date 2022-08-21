@@ -36,15 +36,16 @@ class CocoDetection(torchvision.datasets.CocoDetection):
         super(CocoDetection, self).__init__(img_folder, ann_file)
         self._transforms = transforms
         self.prepare = ConvertCocoPolysToMask(return_masks)
-        self.coco_labels = self.coco.getCatIds
 
     def __getitem__(self, idx):
         img, target = super(CocoDetection, self).__getitem__(idx)
         image_id = self.ids[idx]
         target = {'image_id': image_id, 'annotations': target}
         img, target = self.prepare(img, target)
+        print(target)
         if self._transforms is not None:
             img, target = self._transforms(img, target)
+        print(target)
         return img, target
 
 
@@ -206,12 +207,11 @@ if __name__ == '__main__':
         labels = target["labels"]
 
         for box, label in zip(boxes, labels):
-            # cx, cy, w, h = box
-            # x1 = int((cx - w * 0.5) * img_w)
-            # y1 = int((cy - h * 0.5) * img_h)
-            # x2 = int((cx + w * 0.5) * img_w)
-            # y2 = int((cy + h * 0.5) * img_h)
-            x1, y1, x2, y2 = box.long().tolist()
+            cx, cy, w, h = box
+            x1 = int((cx - w * 0.5) * img_w)
+            y1 = int((cy - h * 0.5) * img_h)
+            x2 = int((cx + w * 0.5) * img_w)
+            y2 = int((cy + h * 0.5) * img_h)
 
             cls_id = int(label)
             color = class_colors[cls_id]
