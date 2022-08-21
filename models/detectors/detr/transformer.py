@@ -62,22 +62,13 @@ class Transformer(nn.Module):
     def forward(self, src, query_embed, pos_embed, mask=None):
         # flatten NxCxHxW to HWxNxC
         bs, c, h, w = src.shape
-        if self.batch_first:
-            # [B, C, H, W] -> [B, C, N] -> [B, N, C]
-            src = src.flatten(2).permute(0, 2, 1).contiguous()
-            # [B, C, H, W] -> [B, C, N] -> [B, N, C]
-            pos_embed = pos_embed.flatten(2).permute(0, 2, 1).contiguous()
-            # [Nq, C] -> [1, Nq, C] -> [B, Nq, C]
-            query_embed = query_embed.unsqueeze(0).repeat(bs, 1, 1)
-            mask = mask.flatten(1) if mask is not None else None
-        else:
-            # [B, C, H, W] -> [B, C, N] -> [N, B, C]
-            src = src.flatten(2).permute(2, 0, 1).contiguous()
-            # [B, C, H, W] -> [B, C, N] -> [N, B, C]
-            pos_embed = pos_embed.flatten(2).permute(2, 0, 1).contiguous()
-            # [Nq, C] -> [Nq, 1, C] -> [Nq, B, C]
-            query_embed = query_embed.unsqueeze(1).repeat(1, bs, 1)
-            mask = mask.flatten(1) if mask is not None else None
+        # [B, C, H, W] -> [B, C, N] -> [N, B, C]
+        src = src.flatten(2).permute(2, 0, 1).contiguous()
+        # [B, C, H, W] -> [B, C, N] -> [N, B, C]
+        pos_embed = pos_embed.flatten(2).permute(2, 0, 1).contiguous()
+        # [Nq, C] -> [Nq, 1, C] -> [Nq, B, C]
+        query_embed = query_embed.unsqueeze(1).repeat(1, bs, 1)
+        mask = mask.flatten(1) if mask is not None else None
 
         tgt = torch.zeros_like(query_embed)
         memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)
