@@ -97,7 +97,7 @@ class Criterion(object):
         src_logits = outputs['pred_logits']
 
         idx = self._get_src_permutation_idx(indices)
-        target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)]).to(self.device)
+        target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)])
         target_classes = torch.full(src_logits.shape[:2], self.num_classes,
                                     dtype=torch.int64, device=src_logits.device)
         target_classes[idx] = target_classes_o
@@ -116,7 +116,7 @@ class Criterion(object):
         assert 'pred_boxes' in outputs
         idx = self._get_src_permutation_idx(indices)
         src_boxes = outputs['pred_boxes'][idx]
-        target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0).to(self.device)
+        target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)
 
         loss_bbox = F.l1_loss(src_boxes, target_boxes, reduction='none')
 

@@ -219,8 +219,6 @@ def train():
                                         for k, v in loss_dict_reduced.items() if k in weight_dict}
             losses_reduced_scaled = sum(loss_dict_reduced_scaled.values())
 
-            loss_value = losses_reduced_scaled.item()
-
             # check loss
             if torch.isnan(losses):
                 print('loss is NAN !!')
@@ -249,8 +247,8 @@ def train():
                 log += '[Iter: {}/{}]'.format(iter_i, epoch_size)
                 log += '[lr: {:.6f}][lr_bk: {:.6f}]'.format(cur_lr_dict['lr'], cur_lr_dict['lr_bk'])
                 # loss infor
-                for k in loss_dict_reduced_unscaled.keys():
-                    log += '[{}: {:.2f}]'.format(k, loss_dict_reduced_unscaled[k])
+                for k in loss_dict_reduced_scaled.keys():
+                    log += '[{}: {:.2f}]'.format(k, loss_dict_reduced_scaled[k])
 
                 # other infor
                 log += '[time: {:.2f}]'.format(t1 - t0)
