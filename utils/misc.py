@@ -10,9 +10,6 @@ from dataset.transforms import build_transform
 
 def build_dataset(cfg, args, device):
     # transform
-    trans_config = cfg['transforms'][args.schedule]
-    print('==============================')
-    print('TrainTransforms: {}'.format(trans_config))
     train_transform = build_transform(
         is_train=True, 
         pixel_mean=cfg['pixel_mean'],
