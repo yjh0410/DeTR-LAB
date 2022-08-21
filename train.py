@@ -39,7 +39,7 @@ def parse_args():
                         help="Adopting mix precision training.")
 
     # model
-    parser.add_argument('-v', '--version', default='detr', type=str,
+    parser.add_argument('-v', '--version', default='detr_r50', type=str,
                         help='build DeTR')
     parser.add_argument('-r', '--resume', default=None, type=str,
                         help='keep training')
@@ -147,7 +147,6 @@ def train():
     # lr scheduler
     lr_scheduler = build_lr_scheduler(
         cfg=cfg,
-        args=args,
         name=args.lr_scheduler,
         optimizer=optimizer,
         resume=args.resume
@@ -162,7 +161,7 @@ def train():
         )
 
     # training configuration
-    max_epoch = cfg['epoch'][args.schedule]['max_epoch']
+    max_epoch = cfg['max_epoch']
     epoch_size = len(dataloader)
     best_map = -1.
     warmup = not args.no_warmup

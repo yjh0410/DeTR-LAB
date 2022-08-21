@@ -35,7 +35,7 @@ class Transformer(nn.Module):
     def __init__(self, d_model=512, nhead=8, num_encoder_layers=6,
                  num_decoder_layers=6, dim_feedforward=2048, dropout=0.1,
                  activation="relu", normalize_before=False,
-                 return_intermediate_dec=False, batch_first=False):
+                 return_intermediate_dec=False):
         super().__init__()
 
         encoder_layer = TransformerEncoderLayer(d_model, nhead, dim_feedforward,
@@ -53,7 +53,6 @@ class Transformer(nn.Module):
 
         self.d_model = d_model
         self.nhead = nhead
-        self.batch_first = batch_first
 
     def _reset_parameters(self):
         for p in self.parameters():
@@ -84,10 +83,8 @@ class Transformer(nn.Module):
         memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)
         hs = self.decoder(tgt, memory, memory_key_padding_mask=mask,
                           pos=pos_embed, query_pos=query_embed)
-        if self.batch_first:
-            return hs, memory.permute(0, 2, 1).view(bs, c, h, w)
-        else:
-            return hs.transpose(1, 2), memory.permute(1, 2, 0).view(bs, c, h, w)
+
+        return hs.transpose(1, 2), memory.permute(1, 2, 0).view(bs, c, h, w)
 
 
 # Transformer Encoder
@@ -314,6 +311,5 @@ def build_transformer(cfg):
         num_encoder_layers=cfg['num_encoders'],
         num_decoder_layers=cfg['num_decoders'],
         normalize_before=cfg['pre_norm'],
-        return_intermediate_dec=True,
-        batch_first=cfg['batch_first']
+        return_intermediate_dec=True
     )

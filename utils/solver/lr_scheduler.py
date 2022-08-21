@@ -1,9 +1,7 @@
 import torch
-from torch import optim
 
 
 def build_lr_scheduler(cfg,
-                       args,
                        name='step',
                        optimizer=None,
                        resume=None):
