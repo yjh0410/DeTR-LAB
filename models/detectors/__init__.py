@@ -7,7 +7,8 @@ def build_model(args,
                 cfg,
                 device, 
                 num_classes=80, 
-                trainable=False, 
+                trainable=False,
+                pretrained=None,
                 resume=None):
     print('==============================')
     print('Build {} ...'.format(args.version.upper()))
@@ -26,9 +27,9 @@ def build_model(args,
     print('Model Configuration: \n', cfg)
 
     # Load pretrained weight
-    if resume is not None:
-        print('Loading pretrained weight: ', resume)
-        checkpoint = torch.load(resume, map_location='cpu')
+    if pretrained is not None:
+        print('Loading pretrained weight: ', pretrained)
+        checkpoint = torch.load(pretrained, map_location='cpu')
         # checkpoint state dict
         checkpoint_state_dict = checkpoint.pop("model")
         # model state dict

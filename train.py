@@ -47,6 +47,8 @@ def parse_args():
                         help="Use auxiliary decoding losses (loss at each layer)")
     parser.add_argument('--use_nms', action='store_true', default=False,
                         help="Use NMS")
+    parser.add_argument('-p', '--pretrained', default=None, type=str,
+                        help='use coco pretrained')
     parser.add_argument('-r', '--resume', default=None, type=str,
                         help='keep training')
 
@@ -111,6 +113,7 @@ def train():
         device=device, 
         num_classes=num_classes, 
         trainable=True,
+        pretrained=args.pretrained,
         resume=args.resume)
     model = net
     model = model.to(device).train()
