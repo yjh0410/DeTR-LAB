@@ -247,7 +247,7 @@ def train():
                 log += '[lr: {:.6f}][lr_bk: {:.6f}]'.format(cur_lr_dict['lr'], cur_lr_dict['lr_bk'])
                 # loss infor
                 for k in loss_dict_reduced_unscaled.keys():
-                    log += '[{}: {:.2f}]'.format(k, loss_dict[k])
+                    log += '[{}: {:.2f}]'.format(k, loss_dict_reduced_unscaled[k])
 
                 # other infor
                 log += '[time: {:.2f}]'.format(t1 - t0)
