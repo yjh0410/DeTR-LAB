@@ -51,9 +51,9 @@ class HungarianMatcher(object):
 
         # Also concat the target labels and boxes
         # [M,] where M is number of all targets in this batch
-        tgt_ids = torch.cat([v["labels"] for v in targets])
+        tgt_ids = torch.cat([v["labels"] for v in targets]).to(out_prob.device)
         # [M, 4] where M is number of all targets in this batch
-        tgt_bbox = torch.cat([v["boxes"] for v in targets])
+        tgt_bbox = torch.cat([v["boxes"] for v in targets]).to(out_prob.device)
 
         # Compute the classification cost. Contrary to the loss, we don't use the NLL,
         # but approximate it in 1 - proba[target class].
