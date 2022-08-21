@@ -151,7 +151,6 @@ def train():
     # lr scheduler
     lr_scheduler = build_lr_scheduler(
         cfg=cfg,
-        name=args.lr_scheduler,
         optimizer=optimizer,
         resume=args.resume
     )
