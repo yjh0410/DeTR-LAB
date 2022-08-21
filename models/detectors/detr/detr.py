@@ -10,6 +10,8 @@ from .mlp import MLP
 
 import utils.box_ops as box_ops
 
+import time
+
 
 # DeTR detector
 class DeTR(nn.Module):
@@ -137,7 +139,7 @@ class DeTR(nn.Module):
     def inference(self, x):
         # backbone
         x = self.backbone(x)
-        x = self.input_proj(x['layer4'])
+        x = self.input_proj(x["0"])
 
         # generate pos embed
         mask = torch.zeros([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool) # [B, H, W]
@@ -217,8 +219,10 @@ class DeTR(nn.Module):
             return self.inference(x)
         else:
             # backbone
+            t0 = time.time()
             x = self.backbone(x)
-            x = self.input_proj(x['layer4'])
+            x = self.input_proj(x["0"])
+            print(time.time() - t0)
 
             # generate pos embed
             fmp_size = x.shape[-2:]

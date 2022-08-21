@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     x = torch.randn(2, 3, 800, 800)
     outputs = model(x)
-    # print(outputs['layer2'].shape)
+    print(outputs["0"].shape)
     for k in outputs.keys():
         print(k)
         f = outputs[k]
