@@ -41,9 +41,9 @@ def parse_args():
     # model
     parser.add_argument('-v', '--version', default='detr_r50', type=str,
                         help='build DeTR')
-    parser.add_argument('--aux_loss', action='store_false',
+    parser.add_argument('--aux_loss', action='store_true', default=False,
                         help="Use auxiliary decoding losses (loss at each layer)")
-    parser.add_argument('--use_nms', action='store_false',
+    parser.add_argument('--use_nms', action='store_true', default=False,
                         help="Use NMS")
     parser.add_argument('-r', '--resume', default=None, type=str,
                         help='keep training')
