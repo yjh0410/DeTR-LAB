@@ -10,6 +10,8 @@ from torch import nn
 from torchvision.models._utils import IntermediateLayerGetter
 from typing import Dict, List
 
+from models import backbone
+
 
 class FrozenBatchNorm2d(torch.nn.Module):
     """
@@ -92,7 +94,7 @@ class Joiner(nn.Sequential):
         super().__init__(backbone)
 
     def forward(self, x):
-        return x
+        return self[0](x)
 
 
 # build resnet
