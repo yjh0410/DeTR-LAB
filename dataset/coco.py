@@ -132,18 +132,22 @@ class ConvertCocoPolysToMask(object):
 
 
 # build coco dataset
-def build_coco(root, transform, is_train=False, return_masks=False):
+def build_coco(root, transform, is_train=False, return_masks=False, testset=False):
     mode = 'instances'
     PATHS = {
         "train": ("{}/train2017".format(root), "{}/annotations/{}_train2017.json".format(root, mode)),
         "val": ("{}/val2017".format(root), "{}/annotations/{}_val2017.json".format(root, mode)),
+        "test": ("{}/test2017".format(root), "{}/annotations/image_info_test-dev2017.json".format(root)),
     }
 
     # image set
     if is_train:
         img_folder, ann_file = PATHS["train"]
     else:
-        img_folder, ann_file = PATHS["val"]
+        if testset:
+            img_folder, ann_file = PATHS["test"]
+        else:
+            img_folder, ann_file = PATHS["val"]
 
     # dataset
     dataset = CocoDetection(

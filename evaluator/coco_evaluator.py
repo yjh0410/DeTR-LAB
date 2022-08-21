@@ -27,16 +27,14 @@ class COCOAPIEvaluator():
             nmsthre (float):
                 IoU threshold of non-max supression ranging from 0 to 1.
         """
-        self.testset = testset
-        if self.testset:
-            image_set = 'test2017'
-        else:
-            image_set = 'val2017'
-
-        self.dataset = COCODataset(
-                            data_dir=data_dir,
-                            image_set=image_set,
-                            transform=None)
+        # build coco dataset
+        self.dataset = build_coco(
+            root=data_dir,
+            transform=transform,
+            is_train=False,
+            return_masks=False,
+            testset=testset
+            )
         self.transform = transform
         self.device = device
 
@@ -66,7 +64,7 @@ class COCOAPIEvaluator():
                 print('[Eval: %d / %d]'%(index, num_images))
 
             # load an image
-            img, id_ = self.dataset.pull_image(index)
+            img, id_ = self.dataset[index]
             h, w, _ = img.shape
             orig_size = np.array([[w, h, w, h]])
 
