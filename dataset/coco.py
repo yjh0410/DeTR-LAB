@@ -209,8 +209,8 @@ if __name__ == '__main__':
             cx, cy, w, h = box
             x1 = int((cx - w * 0.5) * img_w)
             y1 = int((cy - h * 0.5) * img_h)
-            x2 = int((cx) * img_w)
-            y2 = int((cy) * img_h)
+            x2 = int((cx + w * 0.5) * img_w)
+            y2 = int((cy + h * 0.5) * img_h)
 
             cls_id = int(label)
             color = class_colors[cls_id]
