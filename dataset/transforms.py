@@ -288,8 +288,8 @@ def build_transform(is_train=False,
                     random_size=None):
 
     normalize = Compose([
-        T.ToTensor(),
-        T.Normalize(pixel_mean, pixel_std)
+        ToTensor(),
+        Normalize(pixel_mean, pixel_std)
     ])
 
 
