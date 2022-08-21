@@ -145,7 +145,7 @@ class DeTR(nn.Module):
     def inference(self, x):
         # backbone
         x = self.backbone(x)
-        x = self.input_proj(x)
+        x = self.input_proj(x['layer4'])
 
         # generate pos embed
         mask = torch.ones([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool)
@@ -227,7 +227,7 @@ class DeTR(nn.Module):
         else:
             # backbone
             x = self.backbone(x)
-            x = self.input_proj(x)
+            x = self.input_proj(x['layer4'])
 
             # generate pos embed
             fmp_size = x.shape[-2:]
