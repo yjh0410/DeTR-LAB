@@ -33,7 +33,7 @@ def build_dataset(cfg, args, device):
         num_classes = 80
         # dataset
         dataset = build_coco(
-            root=args.root,
+            root=data_dir,
             transform=train_transform,
             return_masks=False
             )
