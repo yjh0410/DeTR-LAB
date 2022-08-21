@@ -166,7 +166,7 @@ if __name__ == '__main__':
     random_size = [600, 700, 800]
     pixel_mean = [0.485, 0.456, 0.406]
     pixel_std = [0.229, 0.224, 0.225]
-    is_train = True
+    is_train = False
     transform = build_transform(
         is_train=is_train,
         pixel_mean=pixel_mean,
