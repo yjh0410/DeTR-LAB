@@ -211,7 +211,6 @@ if __name__ == '__main__':
             y1 = int((cy - h * 0.5) * img_h)
             x2 = int((cx + w * 0.5) * img_w)
             y2 = int((cy + h * 0.5) * img_h)
-            print(x1, y1, x2, y2)
 
             cls_id = int(label)
             color = class_colors[cls_id]
