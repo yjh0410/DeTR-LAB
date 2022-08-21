@@ -207,6 +207,7 @@ if __name__ == '__main__':
 
         for box, label in zip(boxes, labels):
             cx, cy, w, h = box
+            print(cx * img_w, w * img_w)
             x1 = int((cx - w * 0.5) * img_w)
             y1 = int((cy - h * 0.5) * img_h)
             x2 = int((cx + w * 0.5) * img_w)
