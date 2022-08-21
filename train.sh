@@ -1,6 +1,5 @@
 # Train
 python train.py \
-        --cuda \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
         -v detr_r50 \

@@ -108,15 +108,15 @@ def train():
     dataloader = build_dataloader(args, dataset, cfg['batch_size'], CollateFunc())
 
     # build model
-    net = build_model(
+    model = build_model(
         args=args, 
         cfg=cfg,
         device=device, 
         num_classes=num_classes, 
         trainable=True,
         pretrained=args.pretrained,
-        resume=args.resume)
-    model = net
+        resume=args.resume
+        )
     model = model.to(device).train()
 
     # build criterion
@@ -149,6 +149,7 @@ def train():
                          device=device)
         model_copy.trainable = True
         model_copy.train()
+        del model_copy
     if args.distributed:
         # wait for all processes to synchronize
         dist.barrier()
