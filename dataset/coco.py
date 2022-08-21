@@ -9,7 +9,10 @@ import torch.utils.data
 import torchvision
 from pycocotools import mask as coco_mask
 
-from .transforms import build_transform
+try:
+    from .transforms import build_transform
+except:
+    from transforms import build_transform
 
 
 coco_class_labels = ('background',
