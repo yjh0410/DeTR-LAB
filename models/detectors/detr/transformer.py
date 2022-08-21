@@ -59,26 +59,21 @@ class Transformer(nn.Module):
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
 
-    def forward(self, src, query_embed, pos_embed, mask=None):
+    def forward(self, src, mask, query_embed, pos_embed):
         # flatten NxCxHxW to HWxNxC
         bs, c, h, w = src.shape
-        # [B, C, H, W] -> [B, C, N] -> [N, B, C]
-        src = src.flatten(2).permute(2, 0, 1).contiguous()
-        # [B, C, H, W] -> [B, C, N] -> [N, B, C]
-        pos_embed = pos_embed.flatten(2).permute(2, 0, 1).contiguous()
-        # [Nq, C] -> [Nq, 1, C] -> [Nq, B, C]
+        src = src.flatten(2).permute(2, 0, 1)
+        pos_embed = pos_embed.flatten(2).permute(2, 0, 1)
         query_embed = query_embed.unsqueeze(1).repeat(1, bs, 1)
-        mask = mask.flatten(1) if mask is not None else None
+        mask = mask.flatten(1)
 
         tgt = torch.zeros_like(query_embed)
         memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)
         hs = self.decoder(tgt, memory, memory_key_padding_mask=mask,
                           pos=pos_embed, query_pos=query_embed)
-
         return hs.transpose(1, 2), memory.permute(1, 2, 0).view(bs, c, h, w)
 
 
-# Transformer Encoder
 class TransformerEncoder(nn.Module):
 
     def __init__(self, encoder_layer, num_layers, norm=None):
@@ -103,7 +98,6 @@ class TransformerEncoder(nn.Module):
         return output
 
 
-# Transformer Decoder
 class TransformerDecoder(nn.Module):
 
     def __init__(self, decoder_layer, num_layers, norm=None, return_intermediate=False):
@@ -145,7 +139,6 @@ class TransformerDecoder(nn.Module):
         return output.unsqueeze(0)
 
 
-# Transformer Encoder layer
 class TransformerEncoderLayer(nn.Module):
 
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
@@ -206,7 +199,6 @@ class TransformerEncoderLayer(nn.Module):
         return self.forward_post(src, src_mask, src_key_padding_mask, pos)
 
 
-# Transformer Decoder layer
 class TransformerDecoderLayer(nn.Module):
 
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,

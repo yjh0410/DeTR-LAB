@@ -213,16 +213,12 @@ def train():
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
             # inference
-            t0 = time.time()
             outputs = model(images, mask=masks)
-            print(time.time() - t0)
 
             # loss
-            t0 = time.time()
             loss_dict = criterion(outputs, targets)
             weight_dict = criterion.weight_dict
             losses = sum(loss_dict[k] * weight_dict[k] for k in loss_dict.keys() if k in weight_dict)
-            print(time.time() - t0)
 
             # reduce            
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
