@@ -148,7 +148,7 @@ class DeTR(nn.Module):
         x = self.input_proj(x['layer4'])
 
         # generate pos embed
-        mask = torch.ones([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool)
+        mask = torch.ones([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool) # [B, H, W]
         fmp_size = x.shape[-2:]
         pos_embed = self.position_embedding(mask, fmp_size)
 
@@ -233,7 +233,7 @@ class DeTR(nn.Module):
             fmp_size = x.shape[-2:]
             if mask is not None:
                 # [B, H, W]
-                mask = F.interpolate(mask[None], size=fmp_size).bool()[0]
+                mask = F.interpolate(mask[None], size=fmp_size).bool()
             else:
                 mask = torch.ones([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool)
 
