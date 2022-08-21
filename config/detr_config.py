@@ -37,7 +37,7 @@ detr_config = {
         'loss_giou_coef': 2.0,
         'eos_coef': 0.1,
         # training config
-        'batch_size': 16,
+        'batch_size': 2,
         'base_lr': 0.0001 / 16.,
         'bk_lr_ratio': 0.1,
         # warmup
