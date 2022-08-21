@@ -7,4 +7,4 @@ python train.py \
         --eval_epoch 10 \
         --aux_loss \
         --use_nms \
-        # --resume weights/coco/detr_r50/detr_r50.pth
+        # --resume weights/coco/detr_r50/detr-r50-e632da11.pth

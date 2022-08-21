@@ -54,6 +54,10 @@ def parse_args():
     parser.add_argument('-d', '--dataset', default='coco',
                         help='coco, voc, widerface, crowdhuman')
     
+    # train trick
+    parser.add_argument('--no_warmup', action='store_true', default=False,
+                        help='do not use warmup')
+
     # DDP train
     parser.add_argument('-dist', '--distributed', action='store_true', default=False,
                         help='distributed training')
