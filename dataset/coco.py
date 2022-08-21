@@ -204,11 +204,10 @@ if __name__ == '__main__':
 
         boxes = target["boxes"]
         labels = target["labels"]
-        height, width = target['orig_size'].tolist()
-        print(img_h, height, img_w, width)
 
         for box, label in zip(boxes, labels):
             cx, cy, w, h = box
+            print(box)
             x1 = int((cx - w * 0.5) * img_w)
             y1 = int((cy - h * 0.5) * img_h)
             x2 = int((cx + w * 0.5) * img_w)
