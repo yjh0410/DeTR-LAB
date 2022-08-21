@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
     # dataset
     dataset = build_coco(
-        root='/mnt/share/ssd2/dataset',
+        root='/mnt/share/ssd2/dataset/COCO',
         transform=transform,
         is_train=is_train,
         return_masks=False
