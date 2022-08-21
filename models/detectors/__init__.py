@@ -34,9 +34,6 @@ def build_model(args,
         # model state dict
         model_state_dict = model.state_dict()
         # check
-        # for k in list(model_state_dict.keys()):
-        #     print(k)
-        # exit(0)
         for k in list(checkpoint_state_dict.keys()):
             if k in model_state_dict:
                 shape_model = tuple(model_state_dict[k].shape)

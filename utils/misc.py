@@ -30,7 +30,7 @@ def build_dataset(cfg, args, device):
     # dataset
     if args.dataset == 'coco':
         data_dir = os.path.join(args.root, 'COCO')
-        num_classes = 80
+        num_classes = 91
         # dataset
         dataset = build_coco(
             root=data_dir,
