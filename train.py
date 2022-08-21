@@ -92,7 +92,7 @@ def train():
     dataset, evaluator, num_classes = build_dataset(cfg, args, device)
 
     # dataloader
-    dataloader = build_dataloader(args, cfg, dataset, CollateFunc())
+    dataloader = build_dataloader(args, dataset, cfg['batch_size'], CollateFunc())
 
     # build model
     net = build_model(

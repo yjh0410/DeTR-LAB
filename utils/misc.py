@@ -35,6 +35,7 @@ def build_dataset(cfg, args, device):
         dataset = build_coco(
             root=data_dir,
             transform=train_transform,
+            is_train=True,
             return_masks=False
             )
         # evaluator
