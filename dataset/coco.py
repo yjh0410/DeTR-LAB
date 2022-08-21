@@ -207,11 +207,11 @@ if __name__ == '__main__':
         height, width = target['orig_size'].tolist()
 
         for box, label in zip(boxes, labels):
-            x1, y1, x2, y2 = box
-            x1 = int(x1 * img_w)
-            y1 = int(y1 * img_h)
-            x2 = int(x2 * img_w)
-            y2 = int(y2 * img_h)
+            cx, cy, w, h = box
+            x1 = int((cx - w * 0.5) * img_w)
+            y1 = int((cy - h * 0.5) * img_h)
+            x2 = int((cx + w * 0.5) * img_w)
+            y2 = int((cy + h * 0.5) * img_h)
 
             cls_id = int(label)
             color = class_colors[cls_id]
