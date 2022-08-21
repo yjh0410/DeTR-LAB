@@ -144,7 +144,7 @@ class DeTR(nn.Module):
         pos_embed = self.position_embedding(mask, normalize=True)
 
         # transformer
-        h = self.transformer(x, self.query_embed.weight, pos_embed, mask)[0]
+        h = self.transformer(x, mask, self.query_embed.weight, pos_embed)[0]
 
         # output: [M, B, N, C] where M = num_decoder since we use all intermediate outputs of decoder
         outputs_class = self.class_embed(h)
@@ -231,7 +231,7 @@ class DeTR(nn.Module):
             pos_embed = self.position_embedding(mask, normalize=True)
 
             # transformer
-            h = self.transformer(x, self.query_embed.weight, pos_embed, mask)[0]
+            h = self.transformer(x, mask, self.query_embed.weight, pos_embed)[0]
 
             # output: [M, B, N, C] where M = num_decoder since we use all intermediate outputs of decoder
             outputs_class = self.class_embed(h)
