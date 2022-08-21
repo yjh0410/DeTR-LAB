@@ -201,6 +201,7 @@ if __name__ == '__main__':
 
         image = image.copy()
         img_h, img_w = image.shape[:2]
+        print(image.shape)
 
         boxes = target["boxes"]
         labels = target["labels"]
