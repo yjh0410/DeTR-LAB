@@ -122,7 +122,6 @@ def train():
     # build criterion
     criterion = build_criterion(
         cfg=cfg,
-        device=device,
         num_classes=num_classes,
         aux_loss=args.aux_loss
     )
