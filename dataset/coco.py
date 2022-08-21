@@ -206,11 +206,11 @@ if __name__ == '__main__':
         labels = target["labels"]
 
         for box, label in zip(boxes, labels):
-            cx, cy, w, h = box
-            x1 = int((cx - w * 0.5))
-            y1 = int((cy - h * 0.5))
-            x2 = int((cx + w * 0.5))
-            y2 = int((cy + h * 0.5))
+            x1, y1, x2, y2 = box
+            x1 = int(x1)
+            y1 = int(y1)
+            x2 = int(x2)
+            y2 = int(y2)
 
             cls_id = int(label)
             color = class_colors[cls_id]
