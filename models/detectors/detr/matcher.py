@@ -45,9 +45,9 @@ class HungarianMatcher(object):
 
         # We flatten to compute the cost matrices in a batch
         # [B * num_queries, C] = [N, C], where N is B * num_queries
-        out_prob = outputs["pred_logits"].flatten(0, 1).softmax(-1)
+        out_prob = outputs["pred_logits"].flatten(0, 1).softmax(-1).clone().detach()
         # [B * num_queries, 4] = [N, 4]
-        out_bbox = outputs["pred_boxes"].flatten(0, 1)
+        out_bbox = outputs["pred_boxes"].flatten(0, 1).clone().detach()
 
         # Also concat the target labels and boxes
         # [M,] where M is number of all targets in this batch
@@ -67,8 +67,6 @@ class HungarianMatcher(object):
 
         # Compute the giou cost betwen boxes
         # [N, M]
-        print(out_bbox)
-        print(tgt_bbox)
         cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(out_bbox), box_cxcywh_to_xyxy(tgt_bbox))
 
         # Final cost matrix: [N, M]
