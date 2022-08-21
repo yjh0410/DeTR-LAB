@@ -8,3 +8,4 @@ python train.py \
         --aux_loss \
         --use_nms \
         --pretrained weights/coco/detr_r50/detr-r50-e632da11.pth
+        # --resume weights/coco/detr_r50/detr-r50-e632da11.pth
