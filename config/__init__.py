@@ -6,6 +6,10 @@ def build_config(args):
     print('Build {} ...'.format(args.version.upper()))
     
     if args.version in ['detr_r50', 'detr_r50-DC5', 'detr_r101']:
-        cfg = detr_config
+        cfg = detr_config[args.version]
+
+    else:
+        print('Unknown Model !')
+        exit(0)
 
     return cfg
