@@ -92,6 +92,7 @@ class DeTR(nn.Module):
         dim_t = torch.arange(num_pos_feats, dtype=torch.float32, device=self.device)
         dim_t_ = torch.div(dim_t, 2, rounding_mode='floor') / num_pos_feats
         dim_t = temperature ** (2 * dim_t_)
+        print(x_embed.shape, dim_t.shape)
 
         pos_x = torch.div(x_embed[:, :, :, None], dim_t)
         pos_y = torch.div(y_embed[:, :, :, None], dim_t)
