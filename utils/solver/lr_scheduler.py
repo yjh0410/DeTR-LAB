@@ -2,13 +2,12 @@ import torch
 
 
 def build_lr_scheduler(cfg,
-                       name='step',
                        optimizer=None,
                        resume=None):
     print('==============================')
-    print('Lr Scheduler: {}'.format(name))
+    print('Lr Scheduler: {}'.format(cfg['lr_scheduler']))
 
-    if name == 'step':
+    if cfg['lr_scheduler'] == 'step':
         lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer=optimizer, 
             milestones=cfg['lr_epoch']

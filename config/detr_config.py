@@ -40,15 +40,18 @@ detr_config = {
         'batch_size': 16,
         'base_lr': 0.0001 / 16.,
         'bk_lr_ratio': 0.1,
+        # warmup
+        'warmup': 'linear',
+        'wp_iter': 500,
+        'warmup_factor': 0.00066667,
         # optimizer
         'optimizer': 'adamw',
         'momentum': 0.9,
         'weight_decay': 1e-4,
-        'warmup': 'linear',
-        'wp_iter': 1000,
-        'warmup_factor': 0.00066667,
+        # lr scheduler
         'max_epoch': 150,
         'lr_epoch': [100],
+        'lr_scheduler': 'step',
         },
 
     'detr_r50-DC5': {
