@@ -287,7 +287,7 @@ def build_transform(is_train=False,
                     max_size=1333,
                     random_size=None):
 
-    normalize = T.Compose([
+    normalize = Compose([
         T.ToTensor(),
         T.Normalize(pixel_mean, pixel_std)
     ])
