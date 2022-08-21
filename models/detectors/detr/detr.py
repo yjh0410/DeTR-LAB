@@ -233,7 +233,7 @@ class DeTR(nn.Module):
             fmp_size = x.shape[-2:]
             if mask is not None:
                 # [B, H, W]
-                mask = F.interpolate(mask[None], size=fmp_size).bool()
+                mask = F.interpolate(mask[None].float(), size=fmp_size).bool()
             else:
                 mask = torch.ones([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool)
 
