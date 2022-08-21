@@ -87,6 +87,14 @@ class Backbone(BackboneBase):
         super().__init__(backbone, num_channels)
 
 
+class Joiner(nn.Sequential):
+    def __init__(self, backbone):
+        super().__init__(backbone)
+
+    def forward(self, x):
+        return x
+
+
 # build resnet
 def build_resnet(model_name='resnet18', pretrained=False, norm_type='BN', res5_dilation=False):
     backbone = Backbone(model_name, 
@@ -94,9 +102,11 @@ def build_resnet(model_name='resnet18', pretrained=False, norm_type='BN', res5_d
                         dilation=res5_dilation,
                         norm_type=norm_type)
     bk_dims = backbone.num_channels
-    
 
-    return backbone, bk_dims
+    model = Joiner(backbone)
+
+
+    return model, bk_dims
 
 
 if __name__ == '__main__':
