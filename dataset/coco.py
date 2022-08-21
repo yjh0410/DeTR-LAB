@@ -135,8 +135,8 @@ class ConvertCocoPolysToMask(object):
 def build_coco(root, transform, is_train=False, return_masks=False):
     mode = 'instances'
     PATHS = {
-        "train": ("{} / train2017".format(root), "{} / annotations / {}_train2017.json".format(root, mode)),
-        "val": ("{} / val2017".format(root), "{} / annotations / {}_val2017.json".format(root, mode)),
+        "train": ("{}/train2017".format(root), "{}/annotations/{}_train2017.json".format(root, mode)),
+        "val": ("{}/val2017".format(root), "{}/annotations/{}_val2017.json".format(root, mode)),
     }
 
     # image set
