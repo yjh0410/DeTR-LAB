@@ -8,8 +8,6 @@ from ...backbone import build_backbone
 from .transformer import build_transformer
 from .mlp import MLP
 
-from .loss import build_criterion
-
 import utils.box_ops as box_ops
 
 
@@ -18,7 +16,7 @@ class DeTR(nn.Module):
     def __init__(self,
                  cfg,
                  device,
-                 num_classes=80,
+                 num_classes=91,
                  trainable=False,
                  aux_loss=False,
                  use_nms=False):
@@ -57,15 +55,6 @@ class DeTR(nn.Module):
         ## output
         self.class_embed = nn.Linear(self.hidden_dim, num_classes + 1)
         self.bbox_embed = MLP(self.hidden_dim, self.hidden_dim, 4, 3)
-
-        # criterion
-        if self.trainable:
-            self.criterion = build_criterion(
-                cfg=cfg,
-                device=device,
-                num_classes=num_classes,
-                aux_loss=aux_loss
-            )
 
 
     # Position Embedding
@@ -252,7 +241,5 @@ class DeTR(nn.Module):
             outputs = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1]}
             if self.aux_loss:
                 outputs['aux_outputs'] = self.set_aux_loss(outputs_class, outputs_coord)
-            
-            loss_dict = self.criterion(outputs, targets)
 
-            return loss_dict
+            return outputs

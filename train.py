@@ -17,13 +17,14 @@ from utils.misc import CollateFunc, build_dataset, build_dataloader, get_total_g
 from utils.solver.optimizer import build_optimizer
 from utils.solver.lr_scheduler import build_lr_scheduler
 from utils.solver.warmup_schedule import build_warmup
+from utils.criterion import build_criterion
 
 from config import build_config
 from models.detectors import build_model
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='FreeYOLO')
+    parser = argparse.ArgumentParser(description='DeTR')
     # basic
     parser.add_argument('--cuda', action='store_true', default=False,
                         help='use cuda.')
@@ -118,6 +119,15 @@ def train():
     model = net
     model = model.to(device).train()
 
+    # build criterion
+    criterion = build_criterion(
+        cfg=cfg,
+        device=device,
+        num_classes=num_classes,
+        aux_loss=args.aux_loss
+    )
+    criterion.to(device)
+
     # SyncBatchNorm
     if args.sybn and args.distributed:
         print('use SyncBatchNorm ...')
@@ -203,13 +213,15 @@ def train():
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
             # inference
-            loss_dict = model(images, mask=masks, targets=targets)
+            outputs = model(images, mask=masks, targets=targets)
+
+            # loss
+            loss_dict = criterion(outputs, targets)
+            weight_dict = criterion.weight_dict
+            losses = sum(loss_dict[k] * weight_dict[k] for k in loss_dict.keys() if k in weight_dict)
 
             # reduce            
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
-
-            weight_dict = model.criterion.weight_dict
-            losses = sum(loss_dict[k] * weight_dict[k] for k in loss_dict.keys() if k in weight_dict)
 
             # reduce losses over all GPUs for logging purposes
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)

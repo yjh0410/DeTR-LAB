@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 from .matcher import build_matcher
@@ -34,7 +35,7 @@ def sigmoid_focal_loss(inputs, targets, num_boxes, alpha: float = 0.25, gamma: f
     return loss.mean(1).sum() / num_boxes
 
 
-class Criterion(object):
+class Criterion(nn.Module):
     """ This class computes the loss for DETR.
     The process happens in two steps:
         1) we compute hungarian assignment between ground truth boxes and the outputs of the model
@@ -49,6 +50,7 @@ class Criterion(object):
             eos_coef: relative classification weight applied to the no-object category
             losses: list of all the losses to be applied. See get_loss for list of available losses.
         """
+        super().__init__()
         self.device = device
         self.num_classes = num_classes
         self.matcher = matcher
@@ -140,7 +142,7 @@ class Criterion(object):
         return loss_map[loss](outputs, targets, indices, num_boxes, **kwargs)
 
 
-    def __call__(self, outputs, targets):
+    def forward(self, outputs, targets):
         """ This performs the loss computation.
         Parameters:
              outputs: dict of tensors, see the output specification of the model for the format

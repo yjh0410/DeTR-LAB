@@ -1,9 +1,10 @@
 import torch
+import torch.nn as nn
 from scipy.optimize import linear_sum_assignment
 from utils.box_ops import box_cxcywh_to_xyxy, generalized_box_iou
 
 
-class HungarianMatcher(object):
+class HungarianMatcher(nn.Module):
     """This class computes an assignment between the targets and the predictions of the network
     For efficiency reasons, the targets don't include the no_object. Because of this, in general,
     there are more predictions than targets. In this case, we do a 1-to-1 matching of the best predictions,
@@ -17,6 +18,7 @@ class HungarianMatcher(object):
             cost_bbox: This is the relative weight of the L1 error of the bounding box coordinates in the matching cost
             cost_giou: This is the relative weight of the giou loss of the bounding box in the matching cost
         """
+        super().__init__()
         self.cost_class = cost_class
         self.cost_bbox = cost_bbox
         self.cost_giou = cost_giou
@@ -24,7 +26,7 @@ class HungarianMatcher(object):
 
 
     @torch.no_grad()
-    def __call__(self, outputs, targets):
+    def forward(self, outputs, targets):
         """ Performs the matching
         Params:
             outputs: This is a dict that contains at least these entries:
