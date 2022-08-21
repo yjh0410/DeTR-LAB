@@ -83,7 +83,6 @@ class ConvertCocoPolysToMask(object):
         boxes = [obj["bbox"] for obj in anno]
         # guard against no boxes via resizing
         boxes = torch.as_tensor(boxes, dtype=torch.float32).reshape(-1, 4)
-        print(boxes)
         boxes[:, 2:] += boxes[:, :2]
         boxes[:, 0::2].clamp_(min=0, max=w)
         boxes[:, 1::2].clamp_(min=0, max=h)
@@ -218,7 +217,7 @@ if __name__ == '__main__':
 
             # class name
             label = coco_class_labels[cls_id]
-            image = cv2.rectangle(image, (x1, y1, x2, y2), (0, 0, 255), 2)
+            image = cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
             # put the test on the bbox
             cv2.putText(image, label, (x1, y1 - 5), 0, 0.5, color, 1, lineType=cv2.LINE_AA)
