@@ -93,7 +93,6 @@ def train():
     # cuda
     if args.cuda:
         print('use cuda')
-        # cudnn.benchmark = True
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
