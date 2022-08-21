@@ -42,10 +42,9 @@ class CocoDetection(torchvision.datasets.CocoDetection):
         image_id = self.ids[idx]
         target = {'image_id': image_id, 'annotations': target}
         img, target = self.prepare(img, target)
-        print(target)
         if self._transforms is not None:
             img, target = self._transforms(img, target)
-        print(target)
+        print(target['boxes'])
         return img, target
 
 
@@ -84,6 +83,7 @@ class ConvertCocoPolysToMask(object):
         boxes = [obj["bbox"] for obj in anno]
         # guard against no boxes via resizing
         boxes = torch.as_tensor(boxes, dtype=torch.float32).reshape(-1, 4)
+        print(boxes)
         boxes[:, 2:] += boxes[:, :2]
         boxes[:, 0::2].clamp_(min=0, max=w)
         boxes[:, 1::2].clamp_(min=0, max=h)
@@ -202,7 +202,6 @@ if __name__ == '__main__':
 
         image = image.copy()
         img_h, img_w = image.shape[:2]
-        print(img_h, img_w, target['orig_size'])
 
         boxes = target["boxes"]
         labels = target["labels"]
