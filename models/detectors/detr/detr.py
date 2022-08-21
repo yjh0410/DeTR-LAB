@@ -221,7 +221,7 @@ class DeTR(nn.Module):
         return bboxes, scores, labels
                 
 
-    def forward(self, x, mask=None):
+    def forward(self, x, targets=None, mask=None):
         if not self.trainable:
             return self.inference(x)
         else:
@@ -251,6 +251,6 @@ class DeTR(nn.Module):
             if self.aux_loss:
                 outputs['aux_outputs'] = self.set_aux_loss(outputs_class, outputs_coord)
             
-            loss_dict = self.criterion(outputs)
+            loss_dict = self.criterion(outputs, targets)
 
             return loss_dict
