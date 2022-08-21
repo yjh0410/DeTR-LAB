@@ -28,6 +28,10 @@ detr_config = {
         # post process
         'conf_thresh': 0.05,
         'nms_thresh': 0.5,
+        # matcher
+        'set_cost_class': 1.0,
+        'set_cost_bbox': 5.0,
+        'set_cost_giou': 2.0,        
         # loss
         'loss_bbox_coef': 5.0,
         'loss_giou_coef': 2.0,
@@ -74,6 +78,10 @@ detr_config = {
         # post process
         'conf_thresh': 0.05,
         'nms_thresh': 0.5,
+        # matcher
+        'set_cost_class': 1.0,
+        'set_cost_bbox': 5.0,
+        'set_cost_giou': 2.0,        
         # loss
         'loss_bbox_coef': 5.0,
         'loss_giou_coef': 2.0,
@@ -120,6 +128,10 @@ detr_config = {
         # post process
         'conf_thresh': 0.05,
         'nms_thresh': 0.5,
+        # matcher
+        'set_cost_class': 1.0,
+        'set_cost_bbox': 5.0,
+        'set_cost_giou': 2.0,        
         # loss
         'alpha': 0.25,
         'gamma': 2.0,
@@ -168,6 +180,10 @@ detr_config = {
         # post process
         'conf_thresh': 0.05,
         'nms_thresh': 0.5,
+        # matcher
+        'set_cost_class': 1.0,
+        'set_cost_bbox': 5.0,
+        'set_cost_giou': 2.0,        
         # loss
         'loss_bbox_coef': 5.0,
         'loss_giou_coef': 2.0,
