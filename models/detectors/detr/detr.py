@@ -154,6 +154,7 @@ class DeTR(nn.Module):
 
         # transformer
         h = self.transformer(x, self.query_embed.weight, pos_embed, mask)[0]
+        print(h.shape)
 
         # output: [M, B, N, C] where M = num_decoder since we use all intermediate outputs of decoder
         outputs_class = self.class_embed(h)
