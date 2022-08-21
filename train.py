@@ -199,7 +199,6 @@ def train():
 
             # inference
             loss_dict = model(images, mask=masks, targets=targets)
-            losses = loss_dict['losses']
 
             # reduce            
             loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
