@@ -7,6 +7,7 @@ detr_config = {
         'train_max_size': 1333,
         'test_min_size': 800,
         'test_max_size': 1333,
+        'random_size': [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800],
         'pixel_mean': [0.485, 0.456, 0.406],
         'pixel_std': [0.229, 0.224, 0.225],
         # backbone
@@ -52,6 +53,7 @@ detr_config = {
         'train_max_size': 1333,
         'test_min_size': 800,
         'test_max_size': 1333,
+        'random_size': [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800],
         'pixel_mean': [0.485, 0.456, 0.406],
         'pixel_std': [0.229, 0.224, 0.225],
         # backbone
@@ -97,6 +99,7 @@ detr_config = {
         'train_max_size': 1333,
         'test_min_size': 800,
         'test_max_size': 1333,
+        'random_size': [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800],
         'pixel_mean': [0.485, 0.456, 0.406],
         'pixel_std': [0.229, 0.224, 0.225],
         # backbone
@@ -144,6 +147,7 @@ detr_config = {
         'train_max_size': 1333,
         'test_min_size': 800,
         'test_max_size': 1333,
+        'random_size': [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800],
         'pixel_mean': [0.485, 0.456, 0.406],
         'pixel_std': [0.229, 0.224, 0.225],
         # backbone
