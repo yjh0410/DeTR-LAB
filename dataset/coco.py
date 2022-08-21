@@ -207,11 +207,10 @@ if __name__ == '__main__':
 
         for box, label in zip(boxes, labels):
             cx, cy, w, h = box
-            print(box)
-            x1 = int((cx - w * 0.5) * img_w)
-            y1 = int((cy - h * 0.5) * img_h)
-            x2 = int((cx + w * 0.5) * img_w)
-            y2 = int((cy + h * 0.5) * img_h)
+            x1 = int((cx - w * 0.5))
+            y1 = int((cy - h * 0.5))
+            x2 = int((cx + w * 0.5))
+            y2 = int((cy + h * 0.5))
 
             cls_id = int(label)
             color = class_colors[cls_id]
@@ -221,7 +220,7 @@ if __name__ == '__main__':
             image = cv2.rectangle(image, (x1, y1, x2, y2), (0, 0, 255), 2)
 
             # put the test on the bbox
-            cv2.putText(image, label, (int(x1), int(y1 - 5)), 0, 0.5, color, 1, lineType=cv2.LINE_AA)
+            cv2.putText(image, label, (x1, y1 - 5), 0, 0.5, color, 1, lineType=cv2.LINE_AA)
         cv2.imshow('gt', image)
         # cv2.imwrite(str(i)+'.jpg', img)
         cv2.waitKey(0)
