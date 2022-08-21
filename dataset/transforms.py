@@ -9,7 +9,10 @@ import torch
 import torchvision.transforms as T
 import torchvision.transforms.functional as F
 
-from utils.box_ops import box_xyxy_to_cxcywh
+try:
+    from utils.box_ops import box_xyxy_to_cxcywh
+except:
+    from ..utils.box_ops import box_xyxy_to_cxcywh
 
 
 def crop(image, target, region):
