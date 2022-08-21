@@ -69,22 +69,24 @@ class DeTR(nn.Module):
 
 
     # Position Embedding
-    def position_embedding(self, mask, fmp_size, num_pos_feats=128, temperature=10000, normalize=False, scale=None):
-        hs, ws = fmp_size
+    def position_embedding(self, mask, num_pos_feats=128, temperature=10000, normalize=False, scale=None):
         
         if scale is not None and normalize is False:
             raise ValueError("normalize should be True if scale is passed")
         if scale is None:
             scale = 2 * math.pi
+
         assert mask is not None
         not_mask = ~mask
+
         # [B, H, W]
         y_embed = not_mask.cumsum(1, dtype=torch.float32)
         x_embed = not_mask.cumsum(2, dtype=torch.float32)
+
         if normalize:
             eps = 1e-6
-            y_embed = y_embed / (hs + eps) * scale
-            x_embed = x_embed / (ws + eps) * scale
+            y_embed = y_embed / (y_embed[:, -1:, :] + eps) * scale
+            x_embed = x_embed / (x_embed[:, :, -1:] + eps) * scale
 
         dim_t = torch.arange(num_pos_feats, dtype=torch.float32, device=self.device)
         dim_t_ = torch.div(dim_t, 2, rounding_mode='floor') / num_pos_feats
@@ -149,8 +151,7 @@ class DeTR(nn.Module):
 
         # generate pos embed
         mask = torch.ones([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool) # [B, H, W]
-        fmp_size = x.shape[-2:]
-        pos_embed = self.position_embedding(mask, fmp_size)
+        pos_embed = self.position_embedding(mask)
 
         # transformer
         h = self.transformer(x, self.query_embed.weight, pos_embed, mask)[0]
@@ -237,7 +238,7 @@ class DeTR(nn.Module):
             else:
                 mask = torch.ones([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool)
 
-            pos_embed = self.position_embedding(mask, fmp_size)
+            pos_embed = self.position_embedding(mask)
 
             # transformer
             h = self.transformer(x, self.query_embed.weight, pos_embed, mask)[0]
