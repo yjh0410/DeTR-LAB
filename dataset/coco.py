@@ -205,6 +205,7 @@ if __name__ == '__main__':
         boxes = target["boxes"]
         labels = target["labels"]
         height, width = target['orig_size'].tolist()
+        print(img_h, height, img_w, width)
 
         for box, label in zip(boxes, labels):
             cx, cy, w, h = box
