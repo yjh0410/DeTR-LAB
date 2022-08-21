@@ -51,12 +51,15 @@ class FrozenBatchNorm2d(torch.nn.Module):
 
 class BackboneBase(nn.Module):
 
-    def __init__(self, backbone: nn.Module, num_channels: int):
+    def __init__(self, backbone: nn.Module, num_channels: int, return_interm_layers: bool):
         super().__init__()
         for name, parameter in backbone.named_parameters():
             if 'layer2' not in name and 'layer3' not in name and 'layer4' not in name:
                 parameter.requires_grad_(False)
-        return_layers = {'layer2': 'layer2', 'layer3': 'layer3', 'layer4': 'layer4'}        
+        if return_interm_layers:
+            return_layers = {"layer1": "0", "layer2": "1", "layer3": "2", "layer4": "3"}
+        else:
+            return_layers = {'layer4': "0"}
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
         self.num_channels = num_channels
 
@@ -75,7 +78,8 @@ class Backbone(BackboneBase):
                  model_name: str,
                  pretrained: bool,
                  dilation: bool,
-                 norm_type: str):
+                 norm_type: str,
+                 return_interm_layers: bool):
         if norm_type == 'BN':
             norm_layer = nn.BatchNorm2d
         elif norm_type == 'FrozeBN':
@@ -84,7 +88,7 @@ class Backbone(BackboneBase):
             replace_stride_with_dilation=[False, False, dilation],
             pretrained=pretrained, norm_layer=norm_layer)
         num_channels = [128, 256, 512] if model_name in ('resnet18', 'resnet34') else [512, 1024, 2048]
-        super().__init__(backbone, num_channels)
+        super().__init__(backbone, num_channels, return_interm_layers)
 
 
 class Joiner(nn.Sequential):
@@ -100,7 +104,8 @@ def build_resnet(model_name='resnet18', pretrained=False, norm_type='BN', res5_d
     backbone = Backbone(model_name, 
                         pretrained, 
                         dilation=res5_dilation,
-                        norm_type=norm_type)
+                        norm_type=norm_type,
+                        return_interm_layers=False)
     bk_dims = backbone.num_channels
 
     model = Joiner(backbone)
