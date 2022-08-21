@@ -294,7 +294,7 @@ def build_transform(is_train=False,
 
 
     if is_train:
-        return T.Compose([
+        return Compose([
             RandomHorizontalFlip(),
             RandomSelect(
                 RandomResize(random_size, max_size=max_size),
@@ -307,7 +307,7 @@ def build_transform(is_train=False,
             normalize,
         ])
     else:
-        return T.Compose([
+        return Compose([
             RandomResize([min_size], max_size=max_size),
             normalize,
         ])
