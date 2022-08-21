@@ -2,8 +2,8 @@ import torch
 from thop import profile
 
 
-def FLOPs_and_Params(model, img_size, device):
-    x = torch.randn(1, 3, img_size, img_size).to(device)
+def FLOPs_and_Params(model, min_size, max_size, device):
+    x = torch.randn(1, 3, min_size, max_size).to(device)
     print('==============================')
     flops, params = profile(model, inputs=(x, ))
     print('==============================')
