@@ -45,9 +45,9 @@ class HungarianMatcher(object):
 
         # We flatten to compute the cost matrices in a batch
         # [B * num_queries, C] = [N, C], where N is B * num_queries
-        out_prob = outputs["pred_logits"].flatten(0, 1).softmax(-1).clone().detach()
+        out_prob = outputs["pred_logits"].flatten(0, 1).softmax(-1)
         # [B * num_queries, 4] = [N, 4]
-        out_bbox = outputs["pred_boxes"].flatten(0, 1).clone().detach()
+        out_bbox = outputs["pred_boxes"].flatten(0, 1)
 
         # Also concat the target labels and boxes
         # [M,] where M is number of all targets in this batch
