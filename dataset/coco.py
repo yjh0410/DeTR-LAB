@@ -201,17 +201,17 @@ if __name__ == '__main__':
 
         image = image.copy()
         img_h, img_w = image.shape[:2]
-        print(img_h, img_w)
 
         boxes = target["boxes"]
         labels = target["labels"]
 
         for box, label in zip(boxes, labels):
             cx, cy, w, h = box
-            x1 = int((cx) * img_w)
-            y1 = int((cy) * img_h)
-            x2 = int((w) * img_w)
-            y2 = int((h) * img_h)
+            x1 = int((cx - w * 0.5) * img_w)
+            y1 = int((cy - h * 0.5) * img_h)
+            x2 = int((cx + w * 0.5) * img_w)
+            y2 = int((cy + h * 0.5) * img_h)
+            print(x1, y1, x2, y2)
 
             cls_id = int(label)
             color = class_colors[cls_id]
