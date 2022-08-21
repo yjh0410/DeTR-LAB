@@ -9,10 +9,12 @@ import torch
 import torchvision.transforms as T
 import torchvision.transforms.functional as F
 
-try:
-    from utils.box_ops import box_xyxy_to_cxcywh
-except:
-    from ..utils.box_ops import box_xyxy_to_cxcywh
+
+def box_xyxy_to_cxcywh(x):
+    x0, y0, x1, y1 = x.unbind(-1)
+    b = [(x0 + x1) / 2, (y0 + y1) / 2,
+         (x1 - x0), (y1 - y0)]
+    return torch.stack(b, dim=-1)
 
 
 def crop(image, target, region):
