@@ -222,8 +222,9 @@ class DeTR(nn.Module):
             t0 = time.time()
             x = self.backbone(x)
             x = self.input_proj(x["0"])
-            print(time.time() - t0)
+            print('backbone: ', time.time() - t0)
 
+            t0 = time.time()
             # generate pos embed
             fmp_size = x.shape[-2:]
             if mask is not None:
@@ -236,10 +237,13 @@ class DeTR(nn.Module):
 
             # transformer
             h = self.transformer(x, mask, self.query_embed.weight, pos_embed)[0]
+            print('transformer: ', time.time() - t0)
 
+            t0 = time.time()
             # output: [M, B, N, C] where M = num_decoder since we use all intermediate outputs of decoder
             outputs_class = self.class_embed(h)
             outputs_coord = self.bbox_embed(h).sigmoid()
+            print('outpput: ', time.time() - t0)
 
             # we only compute the loss of last output from decoder
             outputs = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1]}
