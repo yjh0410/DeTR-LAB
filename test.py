@@ -194,7 +194,7 @@ if __name__ == '__main__':
 
     # load trained weight
     model = load_weight(model, args.weight)
-    model.eval()
+    model.to(device).eval()
 
     # run
     test(args=args,
