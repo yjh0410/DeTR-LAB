@@ -250,10 +250,6 @@ def train():
                 t1 = time.time()
                 cur_lr = [param_group['lr']  for param_group in optimizer.param_groups]
                 cur_lr_dict = {'lr': cur_lr[0], 'lr_bk': cur_lr[1]}
-                log = dict(
-                    lr=round(cur_lr_dict['lr'], 6),
-                    lr_bk=round(cur_lr_dict['lr_bk'], 6)
-                )
                 # basic infor
                 log =  '[Epoch: {}/{}]'.format(epoch+1, max_epoch)
                 log += '[Iter: {}/{}]'.format(iter_i, epoch_size)
