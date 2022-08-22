@@ -1,8 +1,8 @@
-import torch
-from .detr.detr import DeTR
+from .detr.build import build_detr
 
 
-# build DeTR detector
+
+# build detector
 def build_model(args, 
                 cfg,
                 device, 
@@ -14,46 +14,14 @@ def build_model(args,
     print('Build {} ...'.format(args.version.upper()))
     
     if args.version in ['detr_r50', 'detr_r50-DC5', 'detr_r101', 'detr_r101-DC5']:
-        model = DeTR(
+        model, criterion = build_detr(
+            args=args,
             cfg=cfg,
             device=device,
             num_classes=num_classes,
             trainable=trainable,
-            aux_loss=args.aux_loss,
-            use_nms=args.use_nms
+            pretrained=pretrained,
+            resume=resume
         )
 
-    print('==============================')
-    print('Model Configuration: \n', cfg)
-
-    # Load pretrained weight
-    if pretrained is not None:
-        print('Loading pretrained weight: ', pretrained)
-        checkpoint = torch.load(pretrained, map_location='cpu')
-        # checkpoint state dict
-        checkpoint_state_dict = checkpoint.pop("model")
-        # model state dict
-        model_state_dict = model.state_dict()
-        # check
-        for k in list(checkpoint_state_dict.keys()):
-            if k in model_state_dict:
-                shape_model = tuple(model_state_dict[k].shape)
-                shape_checkpoint = tuple(checkpoint_state_dict[k].shape)
-                if shape_model != shape_checkpoint:
-                    checkpoint_state_dict.pop(k)
-                    print(k)
-            else:
-                checkpoint_state_dict.pop(k)
-                print(k)
-
-        model.load_state_dict(checkpoint_state_dict)
-                        
-    # keep training
-    if resume is not None:
-        print('keep training: ', resume)
-        checkpoint = torch.load(resume, map_location='cpu')
-        # checkpoint state dict
-        checkpoint_state_dict = checkpoint.pop("model")
-        model.load_state_dict(checkpoint_state_dict)
-                        
-    return model
+    return model, criterion

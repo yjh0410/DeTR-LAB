@@ -17,7 +17,6 @@ from utils.misc import CollateFunc, build_dataset, build_dataloader, get_total_g
 from utils.solver.optimizer import build_optimizer
 from utils.solver.lr_scheduler import build_lr_scheduler
 from utils.solver.warmup_schedule import build_warmup
-from utils.criterion import build_criterion
 
 from config import build_config
 from models.detectors import build_model
@@ -107,7 +106,7 @@ def train():
     dataloader = build_dataloader(args, dataset, cfg['batch_size'], CollateFunc())
 
     # build model
-    model = build_model(
+    model, criterion = build_model(
         args=args, 
         cfg=cfg,
         device=device, 
@@ -116,15 +115,10 @@ def train():
         pretrained=args.pretrained,
         resume=args.resume
         )
-    model = model.to(device).train()
 
-    # build criterion
-    criterion = build_criterion(
-        cfg=cfg,
-        num_classes=num_classes,
-        aux_loss=args.aux_loss
-    )
-    criterion.to(device)
+    # set train mode
+    model.to(device).train()
+    criterion.to(device).train()
 
     # SyncBatchNorm
     if args.sybn and args.distributed:
