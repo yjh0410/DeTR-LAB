@@ -99,7 +99,7 @@ def test(args,
 
     for index in range(num_images):
         print('Testing image {:d}/{:d}....'.format(index+1, num_images))
-        image = dataset.pull_image(index)
+        image, _ = dataset.pull_image(index)
 
         orig_h = image.height
         orig_w = image.width
@@ -179,9 +179,6 @@ if __name__ == '__main__':
     class_colors = [(np.random.randint(255),
                      np.random.randint(255),
                      np.random.randint(255)) for _ in range(num_classes)]
-
-    # config
-    cfg = build_config(args)
 
     # build model
     model, _ = build_model(

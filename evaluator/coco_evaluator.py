@@ -42,6 +42,7 @@ class COCOAPIEvaluator():
         self.ap50_95 = 0.
         self.ap50 = 0.
 
+
     def evaluate(self, model):
         """
         COCO average precision (AP) Evaluation. Iterate inference on the test dataset
@@ -64,39 +65,37 @@ class COCOAPIEvaluator():
                 print('[Eval: %d / %d]'%(index, num_images))
 
             # load an image
-            img, id_ = self.dataset[index]
-            h, w, _ = img.shape
-            orig_size = np.array([[w, h, w, h]])
+            image, id = dataset.pull_image(index)
 
-            # preprocess
-            x = self.transform(img)[0]
+            orig_h = image.height
+            orig_w = image.width
+
+            # prepare
+            x = transform(image)[0]
             x = x.unsqueeze(0).to(self.device)
             
-            id_ = int(id_)
-            ids.append(id_)
+            ids.append(int(id))
+
             # inference
             with torch.no_grad():
                 outputs = model(x)
-                bboxes, scores, cls_inds = outputs
+                bboxes, scores, labels = outputs
                 # rescale
-                if self.transform.padding:
-                    # The input image is padded with 0 on the short side, aligning with the long side.
-                    bboxes *= max(h, w)
-                else:
-                    # the input image is not padded.
-                    bboxes *= orig_size
+                bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]] * orig_w, a_min=0., a_max=orig_w)
+                bboxes[..., [1, 3]] = np.clip(bboxes[..., [1, 3]] * orig_h, a_min=0., a_max=orig_h)
 
             for i, box in enumerate(bboxes):
                 x1 = float(box[0])
                 y1 = float(box[1])
                 x2 = float(box[2])
                 y2 = float(box[3])
-                label = self.dataset.class_ids[int(cls_inds[i])]
+                label = self.dataset.class_ids[int(labels[i])]
                 
                 bbox = [x1, y1, x2 - x1, y2 - y1]
                 score = float(scores[i]) # object score * class score
-                A = {"image_id": id_, "category_id": label, "bbox": bbox,
+                A = {"image_id": int(id), "category_id": label, "bbox": bbox,
                      "score": score} # COCO json format
+                     
                 data_dict.append(A)
 
         annType = ['segm', 'bbox', 'keypoints']

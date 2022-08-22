@@ -36,6 +36,7 @@ class CocoDetection(torchvision.datasets.CocoDetection):
         super(CocoDetection, self).__init__(img_folder, ann_file)
         self._transforms = transforms
         self.prepare = ConvertCocoPolysToMask(return_masks)
+        self.class_ids = sorted(self.coco.getCatIds())
 
     def __getitem__(self, idx):
         img, target = super(CocoDetection, self).__getitem__(idx)
@@ -50,14 +51,14 @@ class CocoDetection(torchvision.datasets.CocoDetection):
         id = self.ids[idx]
         image = super(CocoDetection, self)._load_image(id)
 
-        return image
+        return image, id
 
 
     def pull_anno(self, idx):
         id = self.ids[idx]
         target = super(CocoDetection, self)._load_target(id)
 
-        return target
+        return target, id
 
 
 class ConvertCocoPolysToMask(object):
