@@ -38,6 +38,7 @@ class COCOAPIEvaluator():
             )
         self.transform = transform
         self.device = device
+        self.testset = testset
 
         self.map = 0.
         self.ap50_95 = 0.
