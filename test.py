@@ -202,8 +202,6 @@ if __name__ == '__main__':
          device=device, 
          dataset=dataset,
          transform=transform,
-         vis_thresh=cfg['test_score_thresh'],
          class_colors=class_colors,
          class_names=class_names,
-         show=args.show,
-         dataset_name=args.dataset)
+         show=args.show)
