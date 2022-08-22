@@ -90,7 +90,8 @@ class COCOAPIEvaluator():
                 y1 = float(box[1])
                 x2 = float(box[2])
                 y2 = float(box[3])
-                label = self.dataset.class_ids[int(labels[i])]
+                coco_cls_id = self.dataset.class_ids.index(int(labels[i]))
+                label = self.dataset.class_ids[coco_cls_id]
                 
                 bbox = [x1, y1, x2 - x1, y2 - y1]
                 score = float(scores[i]) # object score * class score
