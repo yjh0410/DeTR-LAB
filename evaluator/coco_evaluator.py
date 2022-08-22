@@ -71,7 +71,7 @@ class COCOAPIEvaluator():
             orig_w = image.width
 
             # prepare
-            x = transform(image)[0]
+            x = self.transform(image)[0]
             x = x.unsqueeze(0).to(self.device)
             
             ids.append(int(id))

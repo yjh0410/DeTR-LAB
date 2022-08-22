@@ -9,10 +9,7 @@ def build_model(args,
                 num_classes=80, 
                 trainable=False,
                 pretrained=None,
-                resume=None):
-    print('==============================')
-    print('Build {} ...'.format(args.version.upper()))
-    
+                resume=None):    
     if args.version in ['detr_r50', 'detr_r50-DC5', 'detr_r101', 'detr_r101-DC5']:
         model, criterion = build_detr(
             args=args,
