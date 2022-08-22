@@ -5,46 +5,38 @@ import time
 import numpy as np
 import torch
 
-from dataset.voc import VOC_CLASSES, VOCDetection
-from dataset.coco import coco_class_index, coco_class_labels, COCODataset
-from dataset.transforms import ValTransforms
-from utils.misc import load_weight, TestTimeAugmentation
+from dataset.coco import build_coco, coco_class_labels
+from dataset.transforms import build_transform
+from utils.misc import load_weight
 
 from config import build_config
-from models.detector import build_model
+from models.detectors import build_model
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Object Detection Benchmark')
+    parser = argparse.ArgumentParser(description='DETR Library')
 
     # basic
-    parser.add_argument('--min_size', default=800, type=int,
-                        help='the min size of input image')
-    parser.add_argument('--max_size', default=1333, type=int,
-                        help='the min size of input image')
     parser.add_argument('--show', action='store_true', default=False,
                         help='show the visulization results.')
     parser.add_argument('--cuda', action='store_true', default=False, 
                         help='use cuda.')
     parser.add_argument('--save_folder', default='det_results/', type=str,
                         help='Dir to save results')
+    parser.add_argument('--vis_thresh', default=0.5, type=float,
+                        help='visualize threshold')
 
     # model
-    parser.add_argument('-v', '--version', default='yolof50', type=str,
-                        help='build yolof')
+    parser.add_argument('-v', '--version', default='detr_r50', type=str,
+                        help='build DETR')
     parser.add_argument('--weight', default='weight/',
                         type=str, help='Trained state_dict file path to open')
-    parser.add_argument('--topk', default=100, type=int,
-                        help='NMS threshold')
 
     # dataset
     parser.add_argument('--root', default='/mnt/share/ssd2/dataset',
                         help='data root')
     parser.add_argument('-d', '--dataset', default='coco',
                         help='coco, voc.')
-    # TTA
-    parser.add_argument('-tta', '--test_aug', action='store_true', default=False,
-                        help='use test augmentation.')
 
     return parser.parse_args()
 
@@ -72,18 +64,12 @@ def visualize(img,
               cls_inds, 
               vis_thresh, 
               class_colors, 
-              class_names, 
-              class_indexs=None, 
-              dataset_name='voc'):
+              class_names):
     ts = 0.4
     for i, bbox in enumerate(bboxes):
         if scores[i] > vis_thresh:
             cls_id = int(cls_inds[i])
-            if dataset_name == 'coco':
-                cls_color = class_colors[cls_id]
-                cls_id = class_indexs[cls_id]
-            else:
-                cls_color = class_colors[cls_id]
+            cls_color = class_colors[cls_id]
                 
             if len(class_names) > 1:
                 mess = '%s: %.2f' % (class_names[cls_id], scores[i])
@@ -96,27 +82,23 @@ def visualize(img,
         
 
 def test(args,
-         net, 
+         model, 
          device, 
          dataset,
-         transform=None,
-         vis_thresh=0.4, 
+         transform,
          class_colors=None, 
          class_names=None, 
-         class_indexs=None, 
-         show=False,
-         test_aug=None, 
-         dataset_name='coco'):
+         show=False):
     num_images = len(dataset)
     save_path = os.path.join('det_results/', args.dataset, args.version)
     os.makedirs(save_path, exist_ok=True)
 
     for index in range(num_images):
         print('Testing image {:d}/{:d}....'.format(index+1, num_images))
-        image, _ = dataset.pull_image(index)
+        image = dataset.pull_image(index)
 
-        orig_h, orig_w, _ = image.shape
-        orig_size = np.array([[orig_w, orig_h, orig_w, orig_h]])
+        orig_h = image.height
+        orig_w = image.width
 
         # prepare
         x = transform(image)[0]
@@ -124,34 +106,25 @@ def test(args,
 
         t0 = time.time()
         # inference
-        if test_aug is not None:
-            # test augmentation:
-            bboxes, scores, cls_inds = test_aug(x, net)
-        else:
-            bboxes, scores, cls_inds = net(x)
+        bboxes, scores, cls_inds = model(x)
         print("detection time used ", time.time() - t0, "s")
         
         # rescale
-        if transform.padding:
-            # The input image is padded with 0 on the short side, aligning with the long side.
-            bboxes *= max(orig_h, orig_w)
-        else:
-            # the input image is not padded.
-            bboxes *= orig_size
-        bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]], a_min=0., a_max=orig_w)
-        bboxes[..., [1, 3]] = np.clip(bboxes[..., [1, 3]], a_min=0., a_max=orig_h)
+        bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]] * orig_w, a_min=0., a_max=orig_w)
+        bboxes[..., [1, 3]] = np.clip(bboxes[..., [1, 3]] * orig_h, a_min=0., a_max=orig_h)
 
-        # vis detection
+        # visulize results
+        image = np.array(image)[..., (2, 1, 0)].astype(np.uint8)
+        image = image.copy()
         img_processed = visualize(
                             img=image,
                             bboxes=bboxes,
                             scores=scores,
                             cls_inds=cls_inds,
-                            vis_thresh=vis_thresh,
+                            vis_thresh=args.vis_thresh,
                             class_colors=class_colors,
-                            class_names=class_names,
-                            class_indexs=class_indexs,
-                            dataset_name=dataset_name)
+                            class_names=class_names
+                            )
         if show:
             cv2.imshow('detection', img_processed)
             cv2.waitKey(0)
@@ -168,26 +141,31 @@ if __name__ == '__main__':
     else:
         device = torch.device("cpu")
 
-    # dataset
-    if args.dataset == 'voc':
-        data_dir = os.path.join(args.root, 'VOCdevkit')
-        class_names = VOC_CLASSES
-        class_indexs = None
-        num_classes = 20
-        dataset = VOCDetection(
-                        data_dir=data_dir,
-                        image_sets=[('2007', 'test')],
-                        transform=None)
+    # config
+    cfg = build_config(args)
 
-    elif args.dataset == 'coco':
+    # transform
+    transform = build_transform(
+        is_train=False, 
+        pixel_mean=cfg['pixel_mean'],
+        pixel_std=cfg['pixel_std'],
+        min_size=cfg['test_min_size'],
+        max_size=cfg['test_max_size'],
+        random_size=None
+    )
+
+    # dataset
+    if args.dataset == 'coco':
         data_dir = os.path.join(args.root, 'COCO')
+        num_classes = 91
         class_names = coco_class_labels
-        class_indexs = coco_class_index
-        num_classes = 80
-        dataset = COCODataset(
-                    data_dir=data_dir,
-                    image_set='val2017',
-                    transform=None)
+        # dataset
+        dataset = build_coco(
+            root=data_dir,
+            transform=None,
+            is_train=True,
+            return_masks=False
+            )
     
     else:
         print('unknow dataset !! Only support voc and coco !!')
@@ -202,38 +180,26 @@ if __name__ == '__main__':
     cfg = build_config(args)
 
     # build model
-    model = build_model(args=args, 
-                        cfg=cfg,
-                        device=device, 
-                        num_classes=num_classes, 
-                        trainable=False)
+    model, _ = build_model(
+        args=args, 
+        cfg=cfg,
+        device=device, 
+        num_classes=num_classes, 
+        trainable=False
+        )
 
     # load trained weight
-    model = load_weight(device=device, 
-                        model=model, 
-                        path_to_ckpt=args.weight)
-
-    # TTA
-    test_aug = TestTimeAugmentation(num_classes=num_classes) if args.test_aug else None
-
-    # transform
-    transform = ValTransforms(min_size=cfg['test_min_size'], 
-                              max_size=cfg['test_max_size'],
-                              pixel_mean=cfg['pixel_mean'],
-                              pixel_std=cfg['pixel_std'],
-                              format=cfg['format'],
-                              padding=cfg['val_padding'])
+    model = load_weight(model, args.weight)
+    model.eval()
 
     # run
     test(args=args,
-        net=model, 
-        device=device, 
-        dataset=dataset,
-        transform=transform,
-        vis_thresh=cfg['test_score_thresh'],
-        class_colors=class_colors,
-        class_names=class_names,
-        class_indexs=class_indexs,
-        show=args.show,
-        test_aug=test_aug,
-        dataset_name=args.dataset)
+         model=model, 
+         device=device, 
+         dataset=dataset,
+         transform=transform,
+         vis_thresh=cfg['test_score_thresh'],
+         class_colors=class_colors,
+         class_names=class_names,
+         show=args.show,
+         dataset_name=args.dataset)

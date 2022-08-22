@@ -45,7 +45,17 @@ class CocoDetection(torchvision.datasets.CocoDetection):
         if self._transforms is not None:
             img, target = self._transforms(img, target)
 
-        return img, target
+
+    def pull_image(self, idx):
+        image = super(CocoDetection, self)._load_image(idx)
+
+        return image
+
+
+    def pull_anno(self, idx):
+        target = super(CocoDetection, self)._load_target(idx)
+
+        return target
 
 
 class ConvertCocoPolysToMask(object):

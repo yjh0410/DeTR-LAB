@@ -132,7 +132,7 @@ def get_total_grad_norm(parameters, norm_type=2):
     return total_norm
 
 
-def load_weight(device, model, path_to_ckpt):
+def load_weight(model, path_to_ckpt):
     checkpoint = torch.load(path_to_ckpt, map_location='cpu')
     # checkpoint state dict
     checkpoint_state_dict = checkpoint.pop("model")
@@ -150,7 +150,7 @@ def load_weight(device, model, path_to_ckpt):
             print(k)
 
     model.load_state_dict(checkpoint_state_dict)
-    model = model.to(device).eval()
+
     print('Finished loading model!')
 
     return model
