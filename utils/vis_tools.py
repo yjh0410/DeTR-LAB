@@ -21,10 +21,11 @@ def vis_data(images, targets, masks=None):
     for bi in range(batch_size):
         # to numpy
         image = images[bi].permute(1, 2, 0).cpu().numpy()
-        # to BGR
-        image = image[..., (2, 1, 0)]
         # denormalize
         image = ((image * rgb_std + rgb_mean)*255).astype(np.uint8)
+        # to BGR
+        image = image[..., (2, 1, 0)]
+
         image = image.copy()
         img_h, img_w = image.shape[:2]
 
@@ -50,7 +51,7 @@ def vis_data(images, targets, masks=None):
         if masks is not None:
             mask = masks[bi]
             # to numpy
-            mask = mask.permute(1, 2, 0).cpu().numpy().astype(np.uint8)
+            mask = mask.cpu().numpy().astype(np.uint8)
 
             cv2.imshow('mask', mask)
             cv2.waitKey(0)
