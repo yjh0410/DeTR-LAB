@@ -47,13 +47,15 @@ class CocoDetection(torchvision.datasets.CocoDetection):
 
 
     def pull_image(self, idx):
-        image = super(CocoDetection, self)._load_image(idx)
+        id = self.ids[idx]
+        image = super(CocoDetection, self)._load_image(id)
 
         return image
 
 
     def pull_anno(self, idx):
-        target = super(CocoDetection, self)._load_target(idx)
+        id = self.ids[idx]
+        target = super(CocoDetection, self)._load_target(id)
 
         return target
 
