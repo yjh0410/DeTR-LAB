@@ -14,15 +14,14 @@ def build_detr(args,
     print('==============================')
     print('Build {} ...'.format(args.version.upper()))
     
-    if args.version in ['detr_r50', 'detr_r50-DC5', 'detr_r101', 'detr_r101-DC5']:
-        model = DeTR(
-            cfg=cfg,
-            device=device,
-            num_classes=num_classes,
-            trainable=trainable,
-            aux_loss=args.aux_loss,
-            use_nms=args.use_nms
-        )
+    model = DeTR(
+        cfg=cfg,
+        device=device,
+        num_classes=num_classes,
+        trainable=trainable,
+        aux_loss=args.aux_loss,
+        use_nms=args.use_nms
+    )
 
     print('==============================')
     print('Model Configuration: \n', cfg)
