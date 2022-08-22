@@ -3,7 +3,7 @@ python train.py \
         --cuda \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
-        -v detr_r16 \
+        -v detr_r18 \
         --eval_epoch 10 \
         --no_warmup \
         --aux_loss \
