@@ -20,10 +20,17 @@ pip install -r requirements.txt
 We suggest that PyTorch should be higher than 1.9.0 and Torchvision should be higher than 0.10.3. 
 At least, please make sure your torch is version 1.x.
 
+# This repository
+In this repository, you can enjoy: 
+- [x] DETR
+- [ ] Anchor-DETR
+- [ ] DINO
+
+
 # Experiments
 ## DeTR
 
-We load official pretrained weight to evaluate DeTR on COCO-val.
+I evaluate DeTR by loading official pretrained weight.
 
 | Model        |  backbone  | FPS<sup><br>2080ti |  FLOPs   |  Params |    AP    |  Weight  |
 |--------------|------------|--------------------|----------|---------|----------|----------|
@@ -31,3 +38,62 @@ We load official pretrained weight to evaluate DeTR on COCO-val.
 | DeTR-R50-DC5 |    R-50    |  20                |  162.1 B |  48.3 M |   43.0   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r50-dc5-f0fb7ef5.pth) |
 | DeTR-R101    |    R-101   |  25                |  174.7 B |  55.7 M |   43.1   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r101-2c7b67e5.pth) |
 | DeTR-R101-DC5|    R-101   |  14                |  241.6 B |  55.7 M |   44.3   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r101-dc5-a2e86def.pth) |
+
+
+## Train
+```Shell
+sh train.sh
+```
+
+You can change the configurations of `train.sh`, according to your own situation.
+
+However, limited by my GPU, I can't verify whether this repository can reproduce the performance of the official DETR.
+
+# Test
+```Shell
+python test.py -d coco \
+               --cuda \
+               -v detr_r50 \
+               --weight path/to/weight \
+               --root path/to/dataset/ \
+               --show
+```
+
+# Evaluation
+```Shell
+python eval.py -d coco-val \
+               --cuda \
+               -v detr_r50 \
+               --weight path/to/weight \
+               --root path/to/dataset/
+```
+
+# Demo
+I have provide some images in `data/demo/images/`, so you can run following command to run a demo:
+
+```Shell
+python demo.py --mode image \
+               --path_to_img data/demo/images/ \
+               -v detr_r50 \
+               --cuda \
+               --weight path/to/weight
+```
+
+If you want run a demo of streaming video detection, you need to set `--mode` to `video`, and give the path to video `--path_to_vid`。
+
+```Shell
+python demo.py --mode video \
+               --path_to_img data/demo/videos/your_video \
+               -v detr_r50 \
+               --cuda \
+               --weight path/to/weight
+```
+
+If you want run video detection with your camera, you need to set `--mode` to `camera`。
+
+```Shell
+python demo.py --mode camera \
+               -v detr_r50 \
+               --cuda \
+               --weight path/to/weight
+```
