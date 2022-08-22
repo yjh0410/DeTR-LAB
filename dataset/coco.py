@@ -42,7 +42,6 @@ class CocoDetection(torchvision.datasets.CocoDetection):
         img, target = super(CocoDetection, self).__getitem__(idx)
         image_id = self.ids[idx]
         target = {'image_id': image_id, 'annotations': target}
-        print(target)
         img, target = self.prepare(img, target)
         if self._transforms is not None:
             img, target = self._transforms(img, target)
@@ -184,7 +183,7 @@ if __name__ == '__main__':
     random_size = [600, 700, 800]
     pixel_mean = [0.485, 0.456, 0.406]
     pixel_std = [0.229, 0.224, 0.225]
-    is_train = True
+    is_train = False
     transform = build_transform(
         is_train=is_train,
         pixel_mean=pixel_mean,
