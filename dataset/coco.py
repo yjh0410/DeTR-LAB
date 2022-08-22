@@ -47,18 +47,18 @@ class CocoDetection(torchvision.datasets.CocoDetection):
             img, target = self._transforms(img, target)
 
 
-    def pull_image(self, idx):
-        id = self.ids[idx]
-        image = super(CocoDetection, self)._load_image(id)
+    # def pull_image(self, idx):
+    #     id = self.ids[idx]
+    #     image = super(CocoDetection, self)._load_image(id)
 
-        return image, id
+    #     return image, id
 
 
-    def pull_anno(self, idx):
-        id = self.ids[idx]
-        target = super(CocoDetection, self)._load_target(id)
+    # def pull_anno(self, idx):
+    #     id = self.ids[idx]
+    #     target = super(CocoDetection, self)._load_target(id)
 
-        return target, id
+    #     return target, id
 
 
 class ConvertCocoPolysToMask(object):
