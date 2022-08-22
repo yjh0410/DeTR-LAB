@@ -25,6 +25,10 @@ def parse_args():
                         help='Dir to save results')
     parser.add_argument('--vis_thresh', default=0.5, type=float,
                         help='visualize threshold')
+    parser.add_argument('--aux_loss', action='store_true', default=False, 
+                        help='use intermediate output.')
+    parser.add_argument('--cuuse_nmsa', action='store_true', default=False, 
+                        help='use NMS.')
 
     # model
     parser.add_argument('-v', '--version', default='detr_r50', type=str,
@@ -163,7 +167,7 @@ if __name__ == '__main__':
         dataset = build_coco(
             root=data_dir,
             transform=None,
-            is_train=True,
+            is_train=False,
             return_masks=False
             )
     
