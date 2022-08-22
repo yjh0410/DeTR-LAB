@@ -22,9 +22,12 @@ At least, please make sure your torch is version 1.x.
 
 # Experiments
 ## DeTR
+
+We load official pretrained weight to evaluate DeTR on COCO-val.
+
 | Model        |  backbone  | FPS<sup><br>2080ti |  FLOPs   |  Params |    AP    |  Weight  |
 |--------------|------------|--------------------|----------|---------|----------|----------|
-| DeTR-R50     |    R-50    |  37                |  95.2 B  |  36.7 M |   41.7   | [github]() |
-| DeTR-R50-DC5 |    R-50    |  20                |  162.1 B |  48.3 M |   43.0   | [github]() |
-| DeTR-R101    |    R-101   |  25                |  174.7 B |  55.7 M |   41.0   | [github]() |
-| DeTR-R101-DC5|    R-101   |  14                |  241.6 B |  55.7 M |   41.0   | [github]() |
+| DeTR-R50     |    R-50    |  37                |  95.2 B  |  36.7 M |   41.7   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r50-e632da11.pth) |
+| DeTR-R50-DC5 |    R-50    |  20                |  162.1 B |  48.3 M |   43.0   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r50-dc5-f0fb7ef5.pth) |
+| DeTR-R101    |    R-101   |  25                |  174.7 B |  55.7 M |   43.1   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r101-2c7b67e5.pth) |
+| DeTR-R101-DC5|    R-101   |  14                |  241.6 B |  55.7 M |   44.3   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r101-dc5-a2e86def.pth) |
