@@ -27,7 +27,7 @@ def parse_args():
                         help='visualize threshold')
     parser.add_argument('--aux_loss', action='store_true', default=False, 
                         help='use intermediate output.')
-    parser.add_argument('--cuuse_nmsa', action='store_true', default=False, 
+    parser.add_argument('--use_nms', action='store_true', default=False, 
                         help='use NMS.')
 
     # model
