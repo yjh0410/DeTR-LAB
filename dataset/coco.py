@@ -45,6 +45,7 @@ class CocoDetection(torchvision.datasets.CocoDetection):
         img, target = self.prepare(img, target)
         if self._transforms is not None:
             img, target = self._transforms(img, target)
+            print(img, target)
 
 
     def pull_image(self, idx):
