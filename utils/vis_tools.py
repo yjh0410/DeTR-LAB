@@ -1,8 +1,8 @@
 import numpy as np
 import cv2
+import torch
 
-
-def vis_data(images, targets, masks=None):
+def vis_data(images, targets, masks):
     """
         images: (tensor) [B, 3, H, W]
         targets: (list) a list of targets
@@ -19,8 +19,16 @@ def vis_data(images, targets, masks=None):
                      np.random.randint(255)) for _ in range(91)]
 
     for bi in range(batch_size):
+        # mask
+        mask = masks[bi]
+        image_tensor = images[bi]
+        index = torch.nonzero(~mask)
+
+        # valid image without pad
+        valid_image = image_tensor[:, :index[-1, 0]+1, :index[-1, 1]+1]
+
         # to numpy
-        image = images[bi].permute(1, 2, 0).cpu().numpy()
+        image = valid_image.permute(1, 2, 0).cpu().numpy()
         # denormalize
         image = ((image * rgb_std + rgb_mean)*255).astype(np.uint8)
         # to BGR
@@ -33,6 +41,11 @@ def vis_data(images, targets, masks=None):
         tgt_boxes = targets_i['boxes']
         tgt_labels = targets_i['labels']
 
+        # to numpy
+        mask = mask.cpu().numpy() * 255
+        mask = mask.astype(np.uint8)
+
+        
         for box, label in zip(tgt_boxes, tgt_labels):
             cx, cy, w, h = box
             x1 = int((cx - w * 0.5) * img_w)
@@ -48,11 +61,6 @@ def vis_data(images, targets, masks=None):
         cv2.imshow('groundtruth', image)
         cv2.waitKey(0)
 
-        if masks is not None:
-            mask = masks[bi]
-            # to numpy
-            mask = mask.cpu().numpy() * 255
-            mask = mask.astype(np.uint8)
+        cv2.imshow('mask', mask)
+        cv2.waitKey(0)
 
-            cv2.imshow('mask', mask)
-            cv2.waitKey(0)
