@@ -24,18 +24,22 @@ def vis_data(images, targets, masks):
         image_tensor = images[bi]
         index = torch.nonzero(~mask)
 
+        # pad image
+        # to numpy
+        pad_image = image_tensor.permute(1, 2, 0).cpu().numpy()
+        # denormalize
+        pad_image = ((pad_image * rgb_std + rgb_mean)*255).astype(np.uint8)
+        # to BGR
+        pad_image = pad_image[..., (2, 1, 0)]
+
         # valid image without pad
         valid_image = image_tensor[:, :index[-1, 0]+1, :index[-1, 1]+1]
+        valid_image = valid_image.permute(1, 2, 0).cpu().numpy()
+        valid_image = ((valid_image * rgb_std + rgb_mean)*255).astype(np.uint8)
+        valid_image = valid_image[..., (2, 1, 0)]
 
-        # to numpy
-        image = valid_image.permute(1, 2, 0).cpu().numpy()
-        # denormalize
-        image = ((image * rgb_std + rgb_mean)*255).astype(np.uint8)
-        # to BGR
-        image = image[..., (2, 1, 0)]
-
-        image = image.copy()
-        img_h, img_w = image.shape[:2]
+        valid_image = valid_image.copy()
+        img_h, img_w = valid_image.shape[:2]
 
         targets_i = targets[bi]
         tgt_boxes = targets_i['boxes']
@@ -56,9 +60,12 @@ def vis_data(images, targets, masks):
             cls_id = int(label)
             color = class_colors[cls_id]
 
-            image = cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+            valid_image = cv2.rectangle(valid_image, (x1, y1), (x2, y2), color, 2)
 
-        cv2.imshow('groundtruth', image)
+        cv2.imshow('pad image', pad_image)
+        cv2.waitKey(0)
+
+        cv2.imshow('valid image', valid_image)
         cv2.waitKey(0)
 
         cv2.imshow('mask', mask)
