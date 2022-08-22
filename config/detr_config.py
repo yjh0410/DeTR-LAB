@@ -90,18 +90,21 @@ detr_config = {
         'loss_giou_coef': 2.0,
         'eos_coef': 0.1,
         # training config
-        'batch_size': 16,
+        'batch_size': 2,
         'base_lr': 0.0001 / 16.,
         'bk_lr_ratio': 0.1,
+        # warmup
+        'warmup': 'linear',
+        'wp_iter': 500,
+        'warmup_factor': 0.00066667,
         # optimizer
         'optimizer': 'adamw',
         'momentum': 0.9,
         'weight_decay': 1e-4,
-        'warmup': 'linear',
-        'wp_iter': 1000,
-        'warmup_factor': 0.00066667,
+        # lr scheduler
         'max_epoch': 150,
         'lr_epoch': [100],
+        'lr_scheduler': 'step',
         },
 
     'detr_r101': {
@@ -136,24 +139,25 @@ detr_config = {
         'set_cost_bbox': 5.0,
         'set_cost_giou': 2.0,        
         # loss
-        'alpha': 0.25,
-        'gamma': 2.0,
         'loss_bbox_coef': 5.0,
         'loss_giou_coef': 2.0,
         'eos_coef': 0.1,
         # training config
-        'batch_size': 16,
+        'batch_size': 2,
         'base_lr': 0.0001 / 16.,
         'bk_lr_ratio': 0.1,
+        # warmup
+        'warmup': 'linear',
+        'wp_iter': 500,
+        'warmup_factor': 0.00066667,
         # optimizer
         'optimizer': 'adamw',
         'momentum': 0.9,
         'weight_decay': 1e-4,
-        'warmup': 'linear',
-        'wp_iter': 1000,
-        'warmup_factor': 0.00066667,
+        # lr scheduler
         'max_epoch': 150,
         'lr_epoch': [100],
+        'lr_scheduler': 'step',
         },
 
     'detr_r101-DC5': {
@@ -192,18 +196,21 @@ detr_config = {
         'loss_giou_coef': 2.0,
         'eos_coef': 0.1,
         # training config
-        'batch_size': 16,
+        'batch_size': 2,
         'base_lr': 0.0001 / 16.,
         'bk_lr_ratio': 0.1,
+        # warmup
+        'warmup': 'linear',
+        'wp_iter': 500,
+        'warmup_factor': 0.00066667,
         # optimizer
         'optimizer': 'adamw',
         'momentum': 0.9,
         'weight_decay': 1e-4,
-        'warmup': 'linear',
-        'wp_iter': 1000,
-        'warmup_factor': 0.00066667,
+        # lr scheduler
         'max_epoch': 150,
         'lr_epoch': [100],
+        'lr_scheduler': 'step',
         },
 
 }
