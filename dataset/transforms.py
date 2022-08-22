@@ -308,6 +308,6 @@ def build_transform(is_train=False,
         ])
     else:
         return Compose([
-            # RandomResize([min_size], max_size=max_size),
+            RandomResize([min_size], max_size=max_size),
             normalize,
         ])
