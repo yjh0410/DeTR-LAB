@@ -32,7 +32,7 @@ In this repository, you can enjoy:
 
 I evaluate DETR by loading official pretrained weight.
 
-| Model        |  backbone  | FPS<sup><br>2080ti |  FLOPs   |  Params |    AP    |  Weight  |
+| Model        |  backbone  | FPS<sup><br>3090 |  FLOPs   |  Params |    AP    |  Weight  |
 |--------------|------------|--------------------|----------|---------|----------|----------|
 | DETR-R50     |    R-50    |  37                |  95.2 B  |  36.7 M |   41.7   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r50-e632da11.pth) |
 | DETR-R50-DC5 |    R-50    |  20                |  162.1 B |  48.3 M |   43.0   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/detr-r50-dc5-f0fb7ef5.pth) |
