@@ -259,6 +259,7 @@ class Normalize(object):
             boxes = box_xyxy_to_cxcywh(boxes)
             boxes = boxes / torch.tensor([[w, h, w, h]], dtype=torch.float32)
             target["boxes"] = boxes
+        print(image, target)
         return image, target
 
 
