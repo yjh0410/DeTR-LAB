@@ -167,7 +167,6 @@ class CollateFunc(object):
 
 
     def __call__(self, batch):
-        print(batch)
         batch = list(zip(*batch))
 
         image_list = batch[0]
