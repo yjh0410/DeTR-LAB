@@ -32,14 +32,13 @@ def vis_data(images, targets, masks=None):
         targets_i = targets[bi]
         tgt_boxes = targets_i['boxes']
         tgt_labels = targets_i['labels']
-        oh, ow = targets_i['orig_size'].tolist()
 
         for box, label in zip(tgt_boxes, tgt_labels):
             cx, cy, w, h = box
-            x1 = int((cx - w * 0.5) * ow)
-            y1 = int((cy - h * 0.5) * oh)
-            x2 = int((cx + w * 0.5) * ow)
-            y2 = int((cy + h * 0.5) * oh)
+            x1 = int((cx - w * 0.5) * img_w)
+            y1 = int((cy - h * 0.5) * img_h)
+            x2 = int((cx + w * 0.5) * img_w)
+            y2 = int((cy + h * 0.5) * img_h)
 
             cls_id = int(label)
             color = class_colors[cls_id]
@@ -52,7 +51,8 @@ def vis_data(images, targets, masks=None):
         if masks is not None:
             mask = masks[bi]
             # to numpy
-            mask = mask.cpu().numpy().astype(np.uint8)
+            mask = mask.cpu().numpy() * 255
+            mask = mask.astype(np.uint8)
 
             cv2.imshow('mask', mask)
             cv2.waitKey(0)
