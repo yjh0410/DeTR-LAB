@@ -3,10 +3,10 @@ python train.py \
         --cuda \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
-        -v detr_r50-RT \
-        --eval_epoch 2 \
+        -v detr_r50 \
+        --eval_epoch 10 \
         --no_warmup \
         --aux_loss \
         --use_nms \
-        --pretrained weights/coco/detr_r50-DC5/detr-r50-dc5-f0fb7ef5.pth
+        --pretrained weights/coco/detr_r50/detr-r50-e632da11.pth
         # --resume weights/coco/detr_r50/detr-r50-e632da11.pth
