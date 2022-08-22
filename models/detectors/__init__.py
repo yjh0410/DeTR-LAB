@@ -10,7 +10,7 @@ def build_model(args,
                 trainable=False,
                 pretrained=None,
                 resume=None):    
-    if args.version in ['detr_r18', 'detr_r50', 'detr_r50-DC5', 'detr_r101', 'detr_r101-DC5']:
+    if args.version in ['detr_r18', 'detr_r50', 'detr_r50-DC5', 'detr_r101', 'detr_r101-DC5', 'detr_r50-RT']:
         model, criterion = build_detr(
             args=args,
             cfg=cfg,
