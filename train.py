@@ -11,6 +11,8 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from utils import distributed_utils
+from utils import vis_tools
+from utils.vis_tools import vis_data
 from utils.com_flops_params import FLOPs_and_Params
 from utils.misc import CollateFunc, build_dataset, build_dataloader, get_total_grad_norm
 
@@ -39,6 +41,8 @@ def parse_args():
                         help='after eval epoch, the model is evaluated on val dataset.')
     parser.add_argument('--fp16', dest="fp16", action="store_true", default=False,
                         help="Adopting mix precision training.")
+    parser.add_argument('--vis', dest="vis", action="store_true", default=False,
+                        help="visualize input data.")
 
     # model
     parser.add_argument('-v', '--version', default='detr_r50', type=str,
@@ -199,6 +203,11 @@ def train():
                 print('Warmup is over')
                 warmup = False
                 warmup_scheduler.set_lr(optimizer, base_lr, base_lr)
+
+            # visualize input data
+            if args.vis:
+                vis_tools(images, targets, masks)
+                continue
 
             # to device
             images = images.to(device)
