@@ -65,7 +65,7 @@ class COCOAPIEvaluator():
                 print('[Eval: %d / %d]'%(index, num_images))
 
             # load an image
-            image, id = dataset.pull_image(index)
+            image, id = self.dataset.pull_image(index)
 
             orig_h = image.height
             orig_w = image.width
@@ -95,7 +95,7 @@ class COCOAPIEvaluator():
                 score = float(scores[i]) # object score * class score
                 A = {"image_id": int(id), "category_id": label, "bbox": bbox,
                      "score": score} # COCO json format
-                     
+
                 data_dict.append(A)
 
         annType = ['segm', 'bbox', 'keypoints']
