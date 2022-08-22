@@ -8,5 +8,5 @@ python train.py \
         --no_warmup \
         --aux_loss \
         --use_nms \
-        --pretrained weights/coco/detr_r50/detr-r50-e632da11.pth
+        --pretrained weights/coco/detr_r50-DC5/detr-r50-dc5-f0fb7ef5.pth
         # --resume weights/coco/detr_r50/detr-r50-e632da11.pth
