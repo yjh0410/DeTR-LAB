@@ -206,7 +206,7 @@ def train():
 
             # visualize input data
             if args.vis:
-                vis_tools(images, targets, masks)
+                vis_data(images, targets, masks)
                 continue
 
             # to device
