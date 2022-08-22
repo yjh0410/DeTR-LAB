@@ -3,8 +3,8 @@ python train.py \
         --cuda \
         -d coco \
         --root /mnt/share/ssd2/dataset/ \
-        -v detr_r50 \
-        --eval_epoch 10 \
+        -v detr_r50-RT \
+        --eval_epoch 2 \
         --no_warmup \
         --aux_loss \
         --use_nms \
