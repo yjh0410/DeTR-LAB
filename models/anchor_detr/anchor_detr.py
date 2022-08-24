@@ -193,6 +193,12 @@ class AnchorDeTR(nn.Module):
                 labels = torch.cat([labels, labels_i], dim=0)
                 bboxes = torch.cat([bboxes, bboxes_i], dim=0)
         
+        # topk
+        if scores.shape[0] > 100:
+            scores, indices = torch.topk(scores, 100)
+            labels = labels[indices]
+            bboxes = bboxes[indices]
+
         # to cpu
         scores = scores.cpu().numpy()
         labels = labels.cpu().numpy()
