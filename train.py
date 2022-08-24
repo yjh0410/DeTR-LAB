@@ -19,7 +19,7 @@ from utils.solver.lr_scheduler import build_lr_scheduler
 from utils.solver.warmup_schedule import build_warmup
 
 from config import build_config
-from models.detectors import build_model
+from models import build_model
 
 
 def parse_args():
