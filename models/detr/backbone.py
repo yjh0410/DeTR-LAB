@@ -99,8 +99,9 @@ class Joiner(nn.Sequential):
         return self[0](x)
 
 
-# build resnet
-def build_resnet(model_name='resnet18', pretrained=False, norm_type='BN', res5_dilation=False):
+# build backbone
+def build_backbone(model_name='resnet18', pretrained=False, norm_type='BN', res5_dilation=False):
+    # backbone
     backbone = Backbone(model_name, 
                         pretrained, 
                         dilation=res5_dilation,
@@ -112,10 +113,10 @@ def build_resnet(model_name='resnet18', pretrained=False, norm_type='BN', res5_d
 
 
     return model, bk_dims
-
-
+    
+    
 if __name__ == '__main__':
-    model, feat_dim = build_resnet(model_name='resnet18', pretrained=True, res5_dilation=False)
+    model, feat_dim = build_backbone(model_name='resnet18', pretrained=True, res5_dilation=False)
     print(feat_dim)
 
     x = torch.randn(2, 3, 800, 800)

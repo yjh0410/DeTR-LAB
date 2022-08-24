@@ -4,13 +4,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
-from ...backbone import build_backbone
+from .backbone import build_backbone
 from .transformer import build_transformer
 from .mlp import MLP
 
 import utils.box_ops as box_ops
-
-import time
 
 
 # DeTR detector
