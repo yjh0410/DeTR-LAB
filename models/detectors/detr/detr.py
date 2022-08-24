@@ -43,7 +43,7 @@ class DeTR(nn.Module):
         ## backbone
         self.backbone, bk_dims = build_backbone(
             model_name=cfg['backbone'],
-            pretrained=cfg['pretrained'],
+            pretrained=cfg['pretrained'] and trainable,
             norm_type=cfg['bk_norm'],
             res5_dilation=cfg['res5_dilation']
             )

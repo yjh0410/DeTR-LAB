@@ -150,7 +150,7 @@ def detect(args,
             orig_w = image_pil.width
 
             # prepare
-            x = transform(image)[0]
+            x = transform(image_pil)[0]
             x = x.unsqueeze(0).to(device)
 
             # inference
@@ -196,6 +196,9 @@ def detect(args,
                 # ------------------------- Detection ---------------------------
                 # cv2 -> PIL
                 frame_pil = Image.fromarray(frame.astype(np.uint8))
+
+                orig_h = frame_pil.height
+                orig_w = frame_pil.width
 
                 # prepare
                 x = transform(frame_pil)[0]
