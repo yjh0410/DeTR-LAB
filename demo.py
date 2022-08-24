@@ -25,7 +25,7 @@ def parse_args():
                         help='use cuda.')
     parser.add_argument('--save_folder', default='det_results/', type=str,
                         help='Dir to save results')
-    parser.add_argument('--vis_thresh', default=0.5, type=float,
+    parser.add_argument('-vs', '--vis_thresh', default=0.5, type=float,
                         help='visualize threshold')
     parser.add_argument('--aux_loss', action='store_true', default=False, 
                         help='use intermediate output.')

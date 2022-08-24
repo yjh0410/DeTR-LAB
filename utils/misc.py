@@ -123,39 +123,6 @@ def sigmoid_focal_loss(inputs, targets, num_boxes, alpha: float = 0.25, gamma: f
     return loss.mean(1).sum() / num_boxes
 
 
-def get_total_grad_norm(parameters, norm_type=2):
-    parameters = list(filter(lambda p: p.grad is not None, parameters))
-    norm_type = float(norm_type)
-    device = parameters[0].grad.device
-    total_norm = torch.norm(torch.stack([torch.norm(p.grad.detach(), norm_type).to(device) for p in parameters]),
-                            norm_type)
-    return total_norm
-
-
-def load_weight(model, path_to_ckpt):
-    checkpoint = torch.load(path_to_ckpt, map_location='cpu')
-    # checkpoint state dict
-    checkpoint_state_dict = checkpoint.pop("model")
-    # model state dict
-    model_state_dict = model.state_dict()
-    # check
-    for k in list(checkpoint_state_dict.keys()):
-        if k in model_state_dict:
-            shape_model = tuple(model_state_dict[k].shape)
-            shape_checkpoint = tuple(checkpoint_state_dict[k].shape)
-            if shape_model != shape_checkpoint:
-                checkpoint_state_dict.pop(k)
-        else:
-            checkpoint_state_dict.pop(k)
-            print(k)
-
-    model.load_state_dict(checkpoint_state_dict)
-
-    print('Finished loading model!')
-
-    return model
-
-
 class CollateFunc(object):
     def _max_by_axis(self, the_list):
         # type: (List[List[int]]) -> List[int]
@@ -192,4 +159,44 @@ class CollateFunc(object):
             raise ValueError('not supported')
             
         return batch_tensor, target_list, batch_mask
+
+
+def get_total_grad_norm(parameters, norm_type=2):
+    parameters = list(filter(lambda p: p.grad is not None, parameters))
+    norm_type = float(norm_type)
+    device = parameters[0].grad.device
+    total_norm = torch.norm(torch.stack([torch.norm(p.grad.detach(), norm_type).to(device) for p in parameters]),
+                            norm_type)
+    return total_norm
+
+
+def load_weight(model, path_to_ckpt):
+    checkpoint = torch.load(path_to_ckpt, map_location='cpu')
+    # checkpoint state dict
+    checkpoint_state_dict = checkpoint.pop("model")
+    # model state dict
+    model_state_dict = model.state_dict()
+    # check
+    for k in list(checkpoint_state_dict.keys()):
+        if k in model_state_dict:
+            shape_model = tuple(model_state_dict[k].shape)
+            shape_checkpoint = tuple(checkpoint_state_dict[k].shape)
+            if shape_model != shape_checkpoint:
+                checkpoint_state_dict.pop(k)
+        else:
+            checkpoint_state_dict.pop(k)
+            print(k)
+
+    model.load_state_dict(checkpoint_state_dict)
+
+    print('Finished loading model!')
+
+    return model
+
+
+def inverse_sigmoid(x, eps=1e-5):
+    x = x.clamp(min=0, max=1)
+    x1 = x.clamp(min=eps)
+    x2 = (1 - x).clamp(min=eps)
+    return torch.log(x1/x2)
 
