@@ -121,7 +121,7 @@ class Transformer(nn.Module):
             bs, self.num_pattern * self.num_position, c)
 
 
-        mask = masks[-1].unsqueeze(1).repeat(1,l,1,1).reshape(bs*l,h,w)
+        mask = masks.unsqueeze(1).repeat(1,l,1,1).reshape(bs*l,h,w)
         pos_col, pos_row = mask2pos(mask)
         if self.attention_type=="RCDA":
             posemb_row = self.adapt_pos1d(pos2posemb1d(pos_row))
