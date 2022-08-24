@@ -156,7 +156,7 @@ class AnchorDeTR(nn.Module):
     def inference(self, x):
         # backbone
         x = self.backbone(x)
-        x = self.input_proj[0](x["0"]).unsqueeze(1) # [B, C, H, W]
+        x = self.input_proj[0](x["0"]).unsqueeze(1) # [B, L, C, H, W]
         # generate pos embed
         mask = torch.zeros([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool) # [B, H, W]
 
@@ -231,7 +231,7 @@ class AnchorDeTR(nn.Module):
         else:
             # backbone
             x = self.backbone(x)
-            x = self.input_proj[0](x["0"]) # [B, C, H, W]
+            x = self.input_proj[0](x["0"]).unsqueeze(1) # [B, C, H, W]
 
             # generate pos embed
             fmp_size = x.shape[-2:]
