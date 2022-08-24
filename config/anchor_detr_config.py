@@ -20,22 +20,26 @@ anchor_detr_config = {
         'hidden_dim': 256,
         'dropout': 0.1,
         'num_heads': 8,
-        'mlp_dim': 2048,
+        'mlp_dim': 1024,
         'num_encoders': 6,
         'num_decoders': 6,
-        'pre_norm': False,
-        'num_queries': 100,
+        'num_query_position': 300,
+        'num_query_pattern': 3,
+        'num_feature_levels': 1,
+        'spatial_prior': 'learned', # ['learned', 'grid']
+        'attention_type': "RCDA",   # ['RCDA', 'nn.MultiheadAttention']
         # post process
         'conf_thresh': 0.05,
         'nms_thresh': 0.5,
         # matcher
-        'set_cost_class': 1.0,
+        'set_cost_class': 2.0,
         'set_cost_bbox': 5.0,
         'set_cost_giou': 2.0,        
         # loss
+        'loss_ce_coef': 2.0,
         'loss_bbox_coef': 5.0,
         'loss_giou_coef': 2.0,
-        'eos_coef': 0.1,
+        'focal_alpha': 0.25,
         # training config
         'batch_size': 2,
         'base_lr': 0.0001 / 16.,
@@ -49,8 +53,8 @@ anchor_detr_config = {
         'momentum': 0.9,
         'weight_decay': 1e-4,
         # lr scheduler
-        'max_epoch': 150,
-        'lr_epoch': [100],
+        'max_epoch': 50,
+        'lr_epoch': [40],
         'lr_scheduler': 'step',
         },
 
