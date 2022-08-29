@@ -257,7 +257,7 @@ anchor_detr_config = {
         'spatial_prior': 'learned', # ['learned', 'grid']
         'attention_type': "RCDA",   # ['RCDA', 'nn.MultiheadAttention']
         # post process
-        'conf_thresh': 0.05,
+        'conf_thresh': 0.005,
         'nms_thresh': 0.5,
         # matcher
         'set_cost_class': 2.0,

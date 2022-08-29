@@ -104,6 +104,7 @@ class Transformer(nn.Module):
         # prepare input for decoder
         bs, l, c, h, w = srcs.shape
 
+        # Position 
         if self.spatial_prior == "learned":
             reference_points = self.position.weight.unsqueeze(0).repeat(bs, self.num_pattern, 1)
         elif self.spatial_prior == "grid":
@@ -120,20 +121,23 @@ class Transformer(nn.Module):
         tgt = self.pattern.weight.reshape(1, self.num_pattern, 1, c).repeat(bs, 1, self.num_position, 1).reshape(
             bs, self.num_pattern * self.num_position, c)
 
-
+        # Position embedding
         mask = masks.unsqueeze(1).repeat(1,l,1,1).reshape(bs*l,h,w)
         pos_col, pos_row = mask2pos(mask)
         if self.attention_type=="RCDA":
+            # decoupled row pos & col pos
             posemb_row = self.adapt_pos1d(pos2posemb1d(pos_row))
             posemb_col = self.adapt_pos1d(pos2posemb1d(pos_col))
             posemb_2d = None
         else:
+            # 2d pos
             pos_2d = torch.cat([pos_row.unsqueeze(1).repeat(1, h, 1).unsqueeze(-1), pos_col.unsqueeze(2).repeat(1, 1, w).unsqueeze(-1)],dim=-1)
             posemb_2d = self.adapt_pos2d(pos2posemb2d(pos_2d))
             posemb_row = posemb_col = None
 
         outputs = srcs.reshape(bs * l, c, h, w)
 
+        # Encoder layers
         for idx in range(len(self.encoder_layers)):
             outputs = self.encoder_layers[idx](outputs, mask, posemb_row, posemb_col,posemb_2d)
             if idx < self.num_encoder_layers_level:
@@ -145,6 +149,7 @@ class Transformer(nn.Module):
 
         outputs_classes = []
         outputs_coords = []
+        # Decoder layers
         for lid, layer in enumerate(self.decoder_layers):
             output = layer(output, reference_points, srcs, mask, adapt_pos2d=self.adapt_pos2d,
                            adapt_pos1d=self.adapt_pos1d, posemb_row=posemb_row, posemb_col=posemb_col,posemb_2d=posemb_2d)
@@ -251,7 +256,6 @@ class TransformerEncoderLayerLevel(nn.Module):
         src = self.ffn(src)
         src = src.permute(0, 3, 1, 2)
         return src
-
 
 
 class TransformerDecoderLayer(nn.Module):

@@ -76,41 +76,6 @@ class AnchorDeTR(nn.Module):
             nn.init.constant_(proj[0].bias, 0)
 
 
-    # Position Embedding
-    def position_embedding(self, mask, temperature=10000, normalize=False, scale=None):
-        num_pos_feats = self.hidden_dim // 2
-
-        if scale is not None and normalize is False:
-            raise ValueError("normalize should be True if scale is passed")
-        if scale is None:
-            scale = 2 * math.pi
-
-        assert mask is not None
-        not_mask = ~mask
-
-        # [B, H, W]
-        y_embed = not_mask.cumsum(1, dtype=torch.float32)
-        x_embed = not_mask.cumsum(2, dtype=torch.float32)
-
-        if normalize:
-            eps = 1e-6
-            y_embed = y_embed / (y_embed[:, -1:, :] + eps) * scale
-            x_embed = x_embed / (x_embed[:, :, -1:] + eps) * scale
-
-        dim_t = torch.arange(num_pos_feats, dtype=torch.float32, device=self.device)
-        dim_t_ = torch.div(dim_t, 2, rounding_mode='floor') / num_pos_feats
-        dim_t = temperature ** (2 * dim_t_)
-
-        pos_x = torch.div(x_embed[:, :, :, None], dim_t)
-        pos_y = torch.div(y_embed[:, :, :, None], dim_t)
-        pos_x = torch.stack((pos_x[:, :, :, 0::2].sin(), pos_x[:, :, :, 1::2].cos()), dim=4).flatten(3)
-        pos_y = torch.stack((pos_y[:, :, :, 0::2].sin(), pos_y[:, :, :, 1::2].cos()), dim=4).flatten(3)
-        # [B, d, H, W]
-        pos = torch.cat((pos_y, pos_x), dim=3).permute(0, 3, 1, 2)
-        
-        return pos
-
-
     @torch.jit.unused
     def set_aux_loss(self, outputs_class, outputs_coord):
         # this is a workaround to make torchscript happy, as torchscript
