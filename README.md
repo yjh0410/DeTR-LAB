@@ -46,8 +46,8 @@ I evaluate AnchorDETR by loading official pretrained weight.
 |---------------------|------------|--------------------|----------|---------|----------|----------|
 | Anchor-DETR-R50     |    R-50    |       37           |  97.0 B  |  30.7 M |   41.4   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/AnchorDETR_r50_c5.pth) |
 | Anchor-DETR-R50-DC5 |    R-50    |       20           |  154.0 B |  30.7 M |   43.3   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/AnchorDETR_r50_dc5.pth) |
-| Anchor-DETR-R101    |    R-101   |       21           |  176.5 B |  49.7 M |   42.7   | [github]() |
-| Anchor-DETR-R101-DC5|    R-101   |                  |  233.5 B |  49.7 M |      | [github]() |
+| Anchor-DETR-R101    |    R-101   |       21           |  176.5 B |  49.7 M |   42.7   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/AnchorDETR_r101.pth) |
+| Anchor-DETR-R101-DC5|    R-101   |       16           |  233.5 B |  49.7 M |   44.5   | [github](https://github.com/yjh0410/DeTR-LAB/releases/download/detr_weight/AnchorDETR_r101_dc5.pth) |
 
 
 
