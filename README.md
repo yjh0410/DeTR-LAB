@@ -23,7 +23,7 @@ At least, please make sure your torch is version 1.x.
 # This repository
 In this repository, you can enjoy: 
 - [x] DETR
-- [ ] Anchor-DETR
+- [x] Anchor-DETR
 - [ ] DINO
 
 
