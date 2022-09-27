@@ -159,35 +159,13 @@ class AnchorDeTR(nn.Module):
 
         # we only compute the loss of last output from decoder
         outputs = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1]}
-        if self.aux_loss:
-            outputs['aux_outputs'] = self.set_aux_loss(outputs_class, outputs_coord)
         
         # batch_size = 1
         out_logits, out_bbox = outputs['pred_logits'], outputs['pred_boxes']
 
-        cls_pred_all = []
-        box_pred_all = []
         # [B, N, C] -> [N, C]
-        prob = out_logits[0]
-        bboxes = box_ops.box_cxcywh_to_xyxy(out_bbox)[0]
-
-        cls_pred_all.append(prob)
-        box_pred_all.append(bboxes)
-
-        # intermediate outputs
-        if 'aux_outputs' in outputs:
-            for i, aux_outputs in enumerate(outputs['aux_outputs']):
-                # batch_size = 1
-                out_logits_i, out_bbox_i = aux_outputs['pred_logits'], aux_outputs['pred_boxes']
-                # [B, N, C] -> [N, C]
-                prob_i = out_logits_i[0]
-                bboxes_i = box_ops.box_cxcywh_to_xyxy(out_bbox_i)[0]
-
-                cls_pred_all.append(prob_i)
-                box_pred_all.append(bboxes_i)
-        
-        cls_pred = torch.cat(cls_pred_all, dim=0)
-        box_pred = torch.cat(box_pred_all, dim=0)
+        cls_pred = out_logits[0]
+        box_pred = box_ops.box_cxcywh_to_xyxy(out_bbox)[0]
 
         # post process
         bboxes, scores, labels = self.post_process(cls_pred, box_pred)

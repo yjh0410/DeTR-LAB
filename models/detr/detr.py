@@ -148,33 +148,16 @@ class DeTR(nn.Module):
 
         # we only compute the loss of last output from decoder
         outputs = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1]}
-        if self.aux_loss:
-            outputs['aux_outputs'] = self.set_aux_loss(outputs_class, outputs_coord)
         
         # batch_size = 1
         out_logits, out_bbox = outputs['pred_logits'], outputs['pred_boxes']
+        
         # [B, N, C] -> [N, C]
-        prob = out_logits[0].softmax(-1)
-        scores, labels = prob[..., :-1].max(-1)
+        cls_pred = out_logits[0].softmax(-1)
+        scores, labels = cls_pred[..., :-1].max(-1)
 
         # xywh -> xyxy
         bboxes = box_ops.box_cxcywh_to_xyxy(out_bbox)[0]
-
-        # intermediate outputs
-        if 'aux_outputs' in outputs:
-            for i, aux_outputs in enumerate(outputs['aux_outputs']):
-                # batch_size = 1
-                out_logits_i, out_bbox_i = aux_outputs['pred_logits'], aux_outputs['pred_boxes']
-                # [B, N, C] -> [N, C]
-                prob_i = out_logits_i[0].softmax(-1)
-                scores_i, labels_i = prob_i[..., :-1].max(-1)
-
-                # xywh -> xyxy
-                bboxes_i = box_ops.box_cxcywh_to_xyxy(out_bbox_i)[0]
-
-                scores = torch.cat([scores, scores_i], dim=0)
-                labels = torch.cat([labels, labels_i], dim=0)
-                bboxes = torch.cat([bboxes, bboxes_i], dim=0)
         
         # to cpu
         scores = scores.cpu().numpy()
