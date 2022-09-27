@@ -22,10 +22,19 @@ from .row_column_decoupled_attention import MultiheadRCDA
 
 
 class Transformer(nn.Module):
-    def __init__(self, d_model=256, nhead=8,
-                 num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=1024, dropout=0.,
-                 activation="relu",num_query_position = 300,num_query_pattern=3,
-                 spatial_prior="learned",attention_type="RCDA"):
+    def __init__(self,
+                 d_model=256,
+                 nhead=8,
+                 num_classes=91,
+                 num_encoder_layers=6,
+                 num_decoder_layers=6,
+                 dim_feedforward=1024,
+                 dropout=0.,
+                 activation="relu",
+                 num_query_position=300,
+                 num_query_pattern=3,
+                 spatial_prior="learned",
+                 attention_type="RCDA"):
         super().__init__()
         # basic
         self.d_model = d_model
@@ -35,7 +44,7 @@ class Transformer(nn.Module):
         self.num_encoder_layers = num_encoder_layers
         self.spatial_prior = spatial_prior
         self.num_layers = num_decoder_layers
-        num_classes = 91
+        self.num_classes = num_classes
 
         # encoder
         encoder_layer = TransformerEncoderLayer(d_model, dim_feedforward, dropout, activation, nhead, attention_type)
@@ -69,6 +78,7 @@ class Transformer(nn.Module):
         self.bbox_embed = MLP(d_model, d_model, 4, 3)
 
         self._reset_parameters()
+
 
     def _reset_parameters(self):
 
@@ -131,7 +141,6 @@ class Transformer(nn.Module):
             outputs = self.encoder_layers[idx](outputs, mask, posemb_row, posemb_col,posemb_2d)
 
         srcs = outputs
-
         output = tgt
 
         outputs_classes = []
@@ -365,6 +374,7 @@ def build_transformer(cfg):
     return Transformer(
         d_model=cfg['hidden_dim'],
         nhead=cfg['num_heads'],
+        num_classes=91,
         num_encoder_layers=cfg['num_encoders'],
         num_decoder_layers=cfg['num_decoders'],
         dim_feedforward=cfg['mlp_dim'],
