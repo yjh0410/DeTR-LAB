@@ -1,9 +1,7 @@
 import torch
 
 
-def build_lr_scheduler(cfg,
-                       optimizer=None,
-                       resume=None):
+def build_lr_scheduler(cfg, optimizer=None, resume=None):
     print('==============================')
     print('Lr Scheduler: {}'.format(cfg['lr_scheduler']))
 

@@ -136,14 +136,10 @@ def train():
     # compute FLOPs and Params
     if distributed_utils.is_main_process:
         model_copy = deepcopy(model_without_ddp)
-        model_copy.trainable = False
-        model_copy.eval()
         FLOPs_and_Params(model=model_copy, 
                          min_size=cfg['test_min_size'], 
                          max_size=cfg['test_max_size'], 
                          device=device)
-        model_copy.trainable = True
-        model_copy.train()
         del model_copy
     if args.distributed:
         # wait for all processes to synchronize
@@ -152,30 +148,13 @@ def train():
     # optimizer
     base_lr = cfg['base_lr'] * cfg['batch_size'] * distributed_utils.get_world_size()
     backbone_lr = base_lr * cfg['bk_lr_ratio']
-    optimizer, start_epoch = build_optimizer(
-        model=model_without_ddp,
-        base_lr=base_lr,
-        backbone_lr=backbone_lr,
-        name=cfg['optimizer'],
-        momentum=cfg['momentum'],
-        weight_decay=cfg['weight_decay'],
-        resume=args.resume
-        )
+    optimizer, start_epoch = build_optimizer(cfg, model_without_ddp, base_lr, backbone_lr, args.resume)
     
     # lr scheduler
-    lr_scheduler = build_lr_scheduler(
-        cfg=cfg,
-        optimizer=optimizer,
-        resume=args.resume
-    )
+    lr_scheduler = build_lr_scheduler(cfg, optimizer, args.resume)
 
     # warmup scheduler
-    warmup_scheduler = build_warmup(
-        name=cfg['warmup'],
-        base_lr=base_lr,
-        wp_iter=cfg['wp_iter'],
-        warmup_factor=cfg['warmup_factor']
-        )
+    warmup_scheduler = build_warmup(cfg, base_lr)
 
     # training configuration
     max_epoch = cfg['max_epoch']
