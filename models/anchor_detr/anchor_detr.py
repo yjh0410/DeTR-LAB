@@ -117,6 +117,58 @@ class AnchorDeTR(nn.Module):
         return keep
 
 
+    def post_process(self, cls_pred, box_pred):
+        """
+        Input:
+            cls_pred: (Tensor) [Nq, C]
+            box_pred: (Tensor) [Nq, 4]
+        """
+        # (HxWxAxK,)
+        cls_pred = cls_pred.flatten().sigmoid_()
+
+        # Keep top k top scoring indices only.
+        num_topk = min(100, box_pred.size(0))
+
+        # torch.sort is actually faster than .topk (at least on GPUs)
+        predicted_prob, topk_idxs = cls_pred.sort(descending=True)
+        topk_scores = predicted_prob[:num_topk]
+        topk_idxs = topk_idxs[:num_topk]
+
+        # filter out the proposals with low confidence score
+        keep_idxs = topk_scores > self.conf_thresh
+        scores = topk_scores[keep_idxs]
+        topk_idxs = topk_idxs[keep_idxs]
+
+        topk_box_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
+        labels = topk_idxs % self.num_classes
+
+        box_pred = box_pred[topk_box_idxs]
+
+        # to cpu
+        scores = scores.cpu().numpy()
+        labels = labels.cpu().numpy()
+        bboxes = bboxes.cpu().numpy()
+
+        # nms
+        if self.use_nms:
+            keep = np.zeros(len(bboxes), dtype=np.int)
+            for i in range(self.num_classes):
+                inds = np.where(labels == i)[0]
+                if len(inds) == 0:
+                    continue
+                c_bboxes = bboxes[inds]
+                c_scores = scores[inds]
+                c_keep = self.nms(c_bboxes, c_scores)
+                keep[inds[c_keep]] = 1
+
+            keep = np.where(keep > 0)
+            bboxes = bboxes[keep]
+            scores = scores[keep]
+            labels = labels[keep]
+
+        return bboxes, scores, labels
+
+
     @torch.no_grad()
     def inference(self, x):
         # backbone
@@ -135,12 +187,15 @@ class AnchorDeTR(nn.Module):
         
         # batch_size = 1
         out_logits, out_bbox = outputs['pred_logits'], outputs['pred_boxes']
-        # [B, N, C] -> [N, C]
-        prob = out_logits[0].sigmoid()
-        scores, labels = prob[..., :-1].max(-1)
 
-        # xywh -> xyxy
+        cls_pred_all = []
+        box_pred_all = []
+        # [B, N, C] -> [N, C]
+        prob = out_logits[0]
         bboxes = box_ops.box_cxcywh_to_xyxy(out_bbox)[0]
+
+        cls_pred_all.append(prob)
+        box_pred_all.append(bboxes)
 
         # intermediate outputs
         if 'aux_outputs' in outputs:
@@ -148,44 +203,22 @@ class AnchorDeTR(nn.Module):
                 # batch_size = 1
                 out_logits_i, out_bbox_i = aux_outputs['pred_logits'], aux_outputs['pred_boxes']
                 # [B, N, C] -> [N, C]
-                prob_i = out_logits_i[0].sigmoid()
-                scores_i, labels_i = prob_i[..., :-1].max(-1)
-
-                # xywh -> xyxy
+                prob_i = out_logits_i[0]
                 bboxes_i = box_ops.box_cxcywh_to_xyxy(out_bbox_i)[0]
 
-                scores = torch.cat([scores, scores_i], dim=0)
-                labels = torch.cat([labels, labels_i], dim=0)
-                bboxes = torch.cat([bboxes, bboxes_i], dim=0)
+                cls_pred_all.append(prob_i)
+                box_pred_all.append(bboxes_i)
         
+        cls_pred = torch.cat(cls_pred_all, dim=0)
+        box_pred = torch.cat(box_pred_all, dim=0)
+
+        # post process
+        bboxes, scores, labels = self.post_process(cls_pred, box_pred)
+
         # to cpu
         scores = scores.cpu().numpy()
         labels = labels.cpu().numpy()
         bboxes = bboxes.cpu().numpy()
-
-        # threshold
-        keep = np.where(scores >= self.conf_thresh)
-        scores = scores[keep]
-        labels = labels[keep]
-        bboxes = bboxes[keep]
-
-        # nms
-        if self.use_nms:
-            # nms
-            keep = np.zeros(len(bboxes), dtype=np.int)
-            for i in range(self.num_classes):
-                inds = np.where(labels == i)[0]
-                if len(inds) == 0:
-                    continue
-                c_bboxes = bboxes[inds]
-                c_scores = scores[inds]
-                c_keep = self.nms(c_bboxes, c_scores)
-                keep[inds[c_keep]] = 1
-
-            keep = np.where(keep > 0)
-            scores = scores[keep]
-            labels = labels[keep]
-            bboxes = bboxes[keep]
 
         return bboxes, scores, labels
                 
