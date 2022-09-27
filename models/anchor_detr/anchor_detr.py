@@ -142,7 +142,7 @@ class AnchorDeTR(nn.Module):
         topk_box_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
         labels = topk_idxs % self.num_classes
 
-        box_pred = box_pred[topk_box_idxs]
+        bboxes = box_pred[topk_box_idxs]
 
         # to cpu
         scores = scores.cpu().numpy()
