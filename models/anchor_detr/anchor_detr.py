@@ -215,11 +215,6 @@ class AnchorDeTR(nn.Module):
         # post process
         bboxes, scores, labels = self.post_process(cls_pred, box_pred)
 
-        # to cpu
-        scores = scores.cpu().numpy()
-        labels = labels.cpu().numpy()
-        bboxes = bboxes.cpu().numpy()
-
         return bboxes, scores, labels
                 
 
