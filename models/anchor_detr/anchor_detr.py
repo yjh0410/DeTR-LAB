@@ -28,7 +28,6 @@ class AnchorDeTR(nn.Module):
         self.nms_thresh = cfg['nms_thresh']
         self.stride = cfg['stride']
         self.hidden_dim = cfg['hidden_dim']
-        self.num_feature_levels = cfg['num_feature_levels']
 
         self.aux_loss = aux_loss
         self.use_nms = use_nms
@@ -40,33 +39,15 @@ class AnchorDeTR(nn.Module):
             pretrained=cfg['pretrained'] and trainable,
             norm_type=cfg['bk_norm'],
             res5_dilation=cfg['res5_dilation'],
-            return_interm_layers=cfg['num_feature_levels'] > 1
+            return_interm_layers=False
             )
         
         ## input proj layer
-        if self.num_feature_levels > 1:
-            num_backbone_outs = len(self.stride)
-            input_proj_list = []
-            for _ in range(num_backbone_outs):
-                in_channels = bk_dims[_]
-                if _ == 0:
-                    input_proj_list.append(nn.Sequential(
-                        nn.Conv2d(in_channels, self.hidden_dim, kernel_size=3, stride=2, padding=1),
-                        nn.GroupNorm(32, self.hidden_dim),
-                    ))
-                else:
-                    input_proj_list.append(nn.Sequential(
-                        nn.Conv2d(in_channels, self.hidden_dim, kernel_size=1),
-                        nn.GroupNorm(32, self.hidden_dim),
-                    ))
-            self.input_proj = nn.ModuleList(input_proj_list)
-
-        else:
-            self.input_proj = nn.ModuleList([
-                nn.Sequential(
-                    nn.Conv2d(bk_dims[-1], self.hidden_dim, kernel_size=1),
-                    nn.GroupNorm(32, self.hidden_dim),
-                )])
+        self.input_proj = nn.ModuleList([
+            nn.Sequential(
+                nn.Conv2d(bk_dims[-1], self.hidden_dim, kernel_size=1),
+                nn.GroupNorm(32, self.hidden_dim),
+            )])
 
         ## transformer
         self.transformer = build_transformer(cfg)
@@ -173,7 +154,7 @@ class AnchorDeTR(nn.Module):
     def inference(self, x):
         # backbone
         x = self.backbone(x)
-        x = self.input_proj[0](x["0"]).unsqueeze(1) # [B, L, C, H, W]
+        x = self.input_proj[0](x["0"]) # [B, C, H, W]
         # generate pos embed
         mask = torch.zeros([x.shape[0], *x.shape[-2:]], device=x.device, dtype=torch.bool) # [B, H, W]
 
@@ -224,7 +205,7 @@ class AnchorDeTR(nn.Module):
         else:
             # backbone
             x = self.backbone(x)
-            x = self.input_proj[0](x["0"]).unsqueeze(1) # [B, C, H, W]
+            x = self.input_proj[0](x["0"]) # [B, C, H, W]
 
             # generate pos embed
             fmp_size = x.shape[-2:]

@@ -24,40 +24,31 @@ from .row_column_decoupled_attention import MultiheadRCDA
 class Transformer(nn.Module):
     def __init__(self, d_model=256, nhead=8,
                  num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=1024, dropout=0.,
-                 activation="relu", num_feature_levels=3,num_query_position = 300,num_query_pattern=3,
+                 activation="relu",num_query_position = 300,num_query_pattern=3,
                  spatial_prior="learned",attention_type="RCDA"):
         super().__init__()
-
+        # basic
         self.d_model = d_model
         self.nhead = nhead
-
+        self.num_pattern = num_query_pattern
         self.attention_type = attention_type
-        encoder_layer = TransformerEncoderLayerSpatial(d_model, dim_feedforward,
-                                                          dropout, activation, nhead , attention_type)
-        encoder_layer_level = TransformerEncoderLayerLevel(d_model, dim_feedforward,
-                                                          dropout, activation, nhead)
+        self.num_encoder_layers = num_encoder_layers
+        self.spatial_prior = spatial_prior
+        self.num_layers = num_decoder_layers
+        num_classes = 91
 
-        decoder_layer = TransformerDecoderLayer(d_model, dim_feedforward,
-                                                          dropout, activation, nhead,
-                                                          num_feature_levels, attention_type)
+        # encoder
+        encoder_layer = TransformerEncoderLayer(d_model, dim_feedforward, dropout, activation, nhead, attention_type)
+        self.encoder_layers = _get_clones(encoder_layer, self.num_encoder_layers)
 
-        if num_feature_levels == 1:
-            self.num_encoder_layers_level = 0
-        else:
-            self.num_encoder_layers_level = num_encoder_layers // 2
-        self.num_encoder_layers_spatial = num_encoder_layers - self.num_encoder_layers_level
-
-        self.encoder_layers = _get_clones(encoder_layer, self.num_encoder_layers_spatial)
-        self.encoder_layers_level = _get_clones(encoder_layer_level, self.num_encoder_layers_level)
+        # decoder
+        decoder_layer = TransformerDecoderLayer(d_model, dim_feedforward, dropout, activation, nhead, attention_type)
         self.decoder_layers = _get_clones(decoder_layer, num_decoder_layers)
 
-        self.spatial_prior=spatial_prior
-
-        if num_feature_levels>1:
-            self.level_embed = nn.Embedding(num_feature_levels, d_model)
-        self.num_pattern = num_query_pattern
+        # pattern embed
         self.pattern = nn.Embedding(self.num_pattern, d_model)
 
+        # pos embed
         self.num_position = num_query_position
         if self.spatial_prior == "learned":
             self.position = nn.Embedding(self.num_position, 2)
@@ -73,8 +64,6 @@ class Transformer(nn.Module):
             nn.Linear(d_model, d_model),
         )
 
-        self.num_layers = num_decoder_layers
-        num_classes = 91
 
         self.class_embed = nn.Linear(d_model, num_classes)
         self.bbox_embed = MLP(d_model, d_model, 4, 3)
@@ -102,7 +91,7 @@ class Transformer(nn.Module):
     def forward(self, srcs, masks):
 
         # prepare input for decoder
-        bs, l, c, h, w = srcs.shape
+        bs, c, h, w = srcs.shape
 
         # Position 
         if self.spatial_prior == "learned":
@@ -122,7 +111,7 @@ class Transformer(nn.Module):
             bs, self.num_pattern * self.num_position, c)
 
         # Position embedding
-        mask = masks.unsqueeze(1).repeat(1,l,1,1).reshape(bs*l,h,w)
+        mask = masks
         pos_col, pos_row = mask2pos(mask)
         if self.attention_type=="RCDA":
             # decoupled row pos & col pos
@@ -135,15 +124,13 @@ class Transformer(nn.Module):
             posemb_2d = self.adapt_pos2d(pos2posemb2d(pos_2d))
             posemb_row = posemb_col = None
 
-        outputs = srcs.reshape(bs * l, c, h, w)
+        outputs = srcs
 
         # Encoder layers
         for idx in range(len(self.encoder_layers)):
             outputs = self.encoder_layers[idx](outputs, mask, posemb_row, posemb_col,posemb_2d)
-            if idx < self.num_encoder_layers_level:
-                outputs = self.encoder_layers_level[idx](outputs, level_emb=self.level_embed.weight.unsqueeze(1).unsqueeze(0).repeat(bs,1,1,1).reshape(bs*l,1,c))
 
-        srcs = outputs.reshape(bs, l, c, h, w)
+        srcs = outputs
 
         output = tgt
 
@@ -170,7 +157,7 @@ class Transformer(nn.Module):
         return output
 
 
-class TransformerEncoderLayerSpatial(nn.Module):
+class TransformerEncoderLayer(nn.Module):
     def __init__(self,
                  d_model=256, d_ffn=1024,
                  dropout=0., activation="relu",
@@ -222,46 +209,10 @@ class TransformerEncoderLayerSpatial(nn.Module):
         return src
 
 
-class TransformerEncoderLayerLevel(nn.Module):
-    def __init__(self,
-                 d_model=256, d_ffn=1024,
-                 dropout=0., activation="relu",
-                 n_heads=8):
-        super().__init__()
-
-        # self attention
-        self.self_attn_level = nn.MultiheadAttention(d_model, n_heads, dropout=dropout)
-        self.dropout1 = nn.Dropout(dropout)
-        self.norm1 = nn.LayerNorm(d_model)
-
-        # ffn
-        self.ffn = FFN(d_model, d_ffn, dropout, activation)
-
-    @staticmethod
-    def with_pos_embed(tensor, pos):
-        return tensor if pos is None else tensor + pos
-
-    def forward(self, src, level_emb=0):
-        # self attention
-        bz, c, h, w = src.shape
-        src = src.permute(0, 2, 3, 1)
-
-        src2 = self.self_attn_level(src.reshape(bz, h * w, c) + level_emb, src.reshape(bz, h * w, c) + level_emb,
-                                    src.reshape(bz, h * w, c))[0].reshape(bz, h, w, c)
-
-        src = src + self.dropout1(src2)
-        src = self.norm1(src)
-
-        # ffn
-        src = self.ffn(src)
-        src = src.permute(0, 3, 1, 2)
-        return src
-
-
 class TransformerDecoderLayer(nn.Module):
     def __init__(self, d_model=256, d_ffn=1024,
                  dropout=0., activation="relu", n_heads=8,
-                 n_levels=3, attention_type="RCDA"):
+                 attention_type="RCDA"):
         super().__init__()
 
         self.attention_type = attention_type
@@ -283,11 +234,6 @@ class TransformerDecoderLayer(nn.Module):
         self.dropout2 = nn.Dropout(dropout)
         self.norm2 = nn.LayerNorm(d_model)
 
-
-        # level combination
-        if n_levels>1:
-            self.level_fc = nn.Linear(d_model * n_levels, d_model)
-
         # ffn
         self.ffn = FFN(d_model, d_ffn, dropout, activation)
 
@@ -306,8 +252,8 @@ class TransformerDecoderLayer(nn.Module):
         tgt = tgt + self.dropout2(tgt2)
         tgt = self.norm2(tgt)
 
-        bz, l, c, h, w = srcs.shape
-        srcs = srcs.reshape(bz * l, c, h, w).permute(0, 2, 3, 1)
+        bz, c, h, w = srcs.shape
+        srcs = srcs.permute(0, 2, 3, 1)
 
         if self.attention_type == "RCDA":
             query_pos_x = adapt_pos1d(pos2posemb1d(reference_points[..., 0]))
@@ -317,15 +263,12 @@ class TransformerDecoderLayer(nn.Module):
             src_row = src_col = srcs
             k_row = src_row + posemb_row
             k_col = src_col + posemb_col
-            tgt2 = self.cross_attn((tgt + query_pos_x).repeat(l, 1, 1), (tgt + query_pos_y).repeat(l, 1, 1), k_row, k_col,
+            tgt2 = self.cross_attn((tgt + query_pos_x), (tgt + query_pos_y), k_row, k_col,
                                    srcs, key_padding_mask=src_padding_masks)[0].transpose(0, 1)
         else:
-            tgt2 = self.cross_attn((tgt + query_pos).repeat(l, 1, 1).transpose(0, 1),
-                                   (srcs + posemb_2d).reshape(bz * l, h * w, c).transpose(0,1),
-                                   srcs.reshape(bz * l, h * w, c).transpose(0, 1), key_padding_mask=src_padding_masks.reshape(bz*l, h*w))[0].transpose(0,1)
-
-        if l > 1:
-            tgt2 = self.level_fc(tgt2.reshape(bz, l, tgt_len, c).permute(0, 2, 3, 1).reshape(bz, tgt_len, c * l))
+            tgt2 = self.cross_attn((tgt + query_pos).transpose(0, 1),
+                                   (srcs + posemb_2d).reshape(bz, h * w, c).transpose(0,1),
+                                   srcs.reshape(bz, h * w, c).transpose(0, 1), key_padding_mask=src_padding_masks.reshape(bz, h*w))[0].transpose(0,1)
 
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
@@ -427,7 +370,6 @@ def build_transformer(cfg):
         dim_feedforward=cfg['mlp_dim'],
         dropout=cfg['dropout'],
         activation="relu",
-        num_feature_levels=cfg['num_feature_levels'],
         num_query_position=cfg['num_query_position'],
         num_query_pattern=cfg['num_query_pattern'],
         spatial_prior=cfg['spatial_prior'],

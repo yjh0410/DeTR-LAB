@@ -25,7 +25,6 @@ anchor_detr_config = {
         'num_decoders': 6,
         'num_query_position': 300,
         'num_query_pattern': 3,
-        'num_feature_levels': 1,
         'spatial_prior': 'learned', # ['learned', 'grid']
         'attention_type': "RCDA",   # ['RCDA', 'nn.MultiheadAttention']
         # post process
@@ -82,7 +81,6 @@ anchor_detr_config = {
         'num_decoders': 6,
         'num_query_position': 300,
         'num_query_pattern': 3,
-        'num_feature_levels': 1,
         'spatial_prior': 'learned', # ['learned', 'grid']
         'attention_type': "RCDA",   # ['RCDA', 'nn.MultiheadAttention']
         # post process
@@ -139,7 +137,6 @@ anchor_detr_config = {
         'num_decoders': 6,
         'num_query_position': 300,
         'num_query_pattern': 3,
-        'num_feature_levels': 1,
         'spatial_prior': 'learned', # ['learned', 'grid']
         'attention_type': "RCDA",   # ['RCDA', 'nn.MultiheadAttention']
         # post process
@@ -196,7 +193,6 @@ anchor_detr_config = {
         'num_decoders': 6,
         'num_query_position': 300,
         'num_query_pattern': 3,
-        'num_feature_levels': 1,
         'spatial_prior': 'learned', # ['learned', 'grid']
         'attention_type': "RCDA",   # ['RCDA', 'nn.MultiheadAttention']
         # post process
@@ -253,7 +249,6 @@ anchor_detr_config = {
         'num_decoders': 6,
         'num_query_position': 300,
         'num_query_pattern': 3,
-        'num_feature_levels': 1,
         'spatial_prior': 'learned', # ['learned', 'grid']
         'attention_type': "RCDA",   # ['RCDA', 'nn.MultiheadAttention']
         # post process
