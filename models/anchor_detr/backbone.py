@@ -90,13 +90,14 @@ class Backbone(BackboneBase):
 
 
 # build backbone
-def build_backbone(model_name='resnet18', pretrained=False, norm_type='BN', res5_dilation=False, return_interm_layers=False):
+def build_backbone(cfg, pretrained=False, return_interm_layers=False):
     # backbone
-    backbone = Backbone(model_name, 
-                        pretrained, 
-                        dilation=res5_dilation,
-                        norm_type=norm_type,
-                        return_interm_layers=return_interm_layers)
+    backbone = Backbone(
+        model_name=cfg['backbone'], 
+        pretrained=pretrained, 
+        dilation=cfg['res5_dilation'],
+        norm_type=cfg['bk_norm'],
+        return_interm_layers=return_interm_layers)
     bk_dims = backbone.num_channels
 
 

@@ -28,19 +28,15 @@ class AnchorDeTR(nn.Module):
         self.nms_thresh = cfg['nms_thresh']
         self.stride = cfg['stride']
         self.hidden_dim = cfg['hidden_dim']
+        self.pretrained=cfg['pretrained'] and trainable
 
         self.aux_loss = aux_loss
         self.use_nms = use_nms
+        
 
         # --------- Network Parameters ----------
         ## backbone
-        self.backbone, bk_dims = build_backbone(
-            model_name=cfg['backbone'],
-            pretrained=cfg['pretrained'] and trainable,
-            norm_type=cfg['bk_norm'],
-            res5_dilation=cfg['res5_dilation'],
-            return_interm_layers=False
-            )
+        self.backbone, bk_dims = build_backbone(cfg, self.pretrained, False)
         
         ## input proj layer
         self.input_proj = nn.ModuleList([

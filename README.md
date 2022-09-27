@@ -84,20 +84,22 @@ I have provide some images in `data/demo/images/`, so you can run following comm
 
 ```Shell
 python demo.py --mode image \
-               --path_to_img data/demo/images/ \
+               --path_to_img dataset/demo/images/ \
                -v detr_r50 \
                --cuda \
-               --weight path/to/weight
+               --weight path/to/weight \
+               --show
 ```
 
 If you want run a demo of streaming video detection, you need to set `--mode` to `video`, and give the path to video `--path_to_vid`。
 
 ```Shell
 python demo.py --mode video \
-               --path_to_img data/demo/videos/your_video \
+               --path_to_img dataset/demo/videos/video_name \
                -v detr_r50 \
                --cuda \
-               --weight path/to/weight
+               --weight path/to/weight \
+               --show
 ```
 
 If you want run video detection with your camera, you need to set `--mode` to `camera`。
@@ -106,5 +108,6 @@ If you want run video detection with your camera, you need to set `--mode` to `c
 python demo.py --mode camera \
                -v detr_r50 \
                --cuda \
-               --weight path/to/weight
+               --weight path/to/weight \
+               --show
 ```
