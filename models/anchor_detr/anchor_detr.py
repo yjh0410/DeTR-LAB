@@ -8,6 +8,7 @@ from .backbone import build_backbone
 from .transformer import build_transformer
 
 import utils.box_ops as box_ops
+from utils.nms import multiclass_nms
 
 
 # AnchorDeTR detector
@@ -62,38 +63,6 @@ class AnchorDeTR(nn.Module):
                 for a, b in zip(outputs_class[:-1], outputs_coord[:-1])]
 
 
-    def nms(self, dets, scores):
-        """"Pure Python NMS."""
-        x1 = dets[:, 0]  #xmin
-        y1 = dets[:, 1]  #ymin
-        x2 = dets[:, 2]  #xmax
-        y2 = dets[:, 3]  #ymax
-
-        areas = (x2 - x1) * (y2 - y1)
-        order = scores.argsort()[::-1]
-
-        keep = []
-        while order.size > 0:
-            i = order[0]
-            keep.append(i)
-            # compute iou
-            xx1 = np.maximum(x1[i], x1[order[1:]])
-            yy1 = np.maximum(y1[i], y1[order[1:]])
-            xx2 = np.minimum(x2[i], x2[order[1:]])
-            yy2 = np.minimum(y2[i], y2[order[1:]])
-
-            w = np.maximum(1e-10, xx2 - xx1)
-            h = np.maximum(1e-10, yy2 - yy1)
-            inter = w * h
-
-            ovr = inter / (areas[i] + areas[order[1:]] - inter + 1e-14)
-            #reserve all the boundingbox whose ovr less than thresh
-            inds = np.where(ovr <= self.nms_thresh)[0]
-            order = order[inds + 1]
-
-        return keep
-
-
     def post_process(self, cls_pred, box_pred):
         """
         Input:
@@ -127,21 +96,8 @@ class AnchorDeTR(nn.Module):
         bboxes = bboxes.cpu().numpy()
 
         # nms
-        if self.use_nms:
-            keep = np.zeros(len(bboxes), dtype=np.int)
-            for i in range(self.num_classes):
-                inds = np.where(labels == i)[0]
-                if len(inds) == 0:
-                    continue
-                c_bboxes = bboxes[inds]
-                c_scores = scores[inds]
-                c_keep = self.nms(c_bboxes, c_scores)
-                keep[inds[c_keep]] = 1
-
-            keep = np.where(keep > 0)
-            bboxes = bboxes[keep]
-            scores = scores[keep]
-            labels = labels[keep]
+        scores, labels, bboxes = multiclass_nms(
+            scores, labels, bboxes, self.nms_thresh, self.num_classes, False)
 
         return bboxes, scores, labels
 

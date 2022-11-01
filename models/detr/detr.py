@@ -9,6 +9,7 @@ from .transformer import build_transformer
 from .mlp import MLP
 
 import utils.box_ops as box_ops
+from utils.nms import multiclass_nms
 
 
 # DeTR detector
@@ -171,22 +172,8 @@ class DeTR(nn.Module):
         bboxes = bboxes[keep]
 
         # nms
-        if self.use_nms:
-            # nms
-            keep = np.zeros(len(bboxes), dtype=np.int)
-            for i in range(self.num_classes):
-                inds = np.where(labels == i)[0]
-                if len(inds) == 0:
-                    continue
-                c_bboxes = bboxes[inds]
-                c_scores = scores[inds]
-                c_keep = self.nms(c_bboxes, c_scores)
-                keep[inds[c_keep]] = 1
-
-            keep = np.where(keep > 0)
-            scores = scores[keep]
-            labels = labels[keep]
-            bboxes = bboxes[keep]
+        scores, labels, bboxes = multiclass_nms(
+            scores, labels, bboxes, self.nms_thresh, self.num_classes, False)
 
         return bboxes, scores, labels
                 
