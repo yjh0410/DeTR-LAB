@@ -1,3 +1,6 @@
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+# https://github.com/facebookresearch/detr
+
 import torch
 import torch.nn as nn
 from scipy.optimize import linear_sum_assignment
